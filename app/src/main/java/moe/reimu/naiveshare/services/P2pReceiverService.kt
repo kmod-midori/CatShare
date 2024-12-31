@@ -55,6 +55,7 @@ import kotlin.random.Random
 
 class P2pReceiverService : Service() {
     private val p2pReceiver = object : BroadcastReceiver() {
+        @Suppress("DEPRECATION")
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(P2pReceiverService.TAG, "Action: ${intent.action}")
 
@@ -121,7 +122,7 @@ class P2pReceiverService : Service() {
         return null
     }
 
-    @SuppressLint("MissingPermission")
+    @Suppress("DEPRECATION")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null && intent.hasExtra("p2p_info")) {
             val info = intent.getParcelableExtra<P2pInfo>("p2p_info")

@@ -35,6 +35,7 @@ class ReceiverTileService : TileService() {
     private var receiver: MyReceiver? = null
 
     @SuppressLint("StartActivityAndCollapseDeprecated")
+    @Suppress("DEPRECATION")
     override fun onClick() {
         val intent = when (qsTile.state) {
             Tile.STATE_ACTIVE -> StartReceiverActivity.getIntent(this, true)
