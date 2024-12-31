@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">NaiveShare</string>
+    <string name="send">Send</string>
+    <string name="discoverable">Discoverable</string>
+    <string name="discoverable_desc">Others may send files to you</string>
+    <string name="send_desc">Choose files and photos</string>
+    <string name="not_impl">This feature is under development</string>
+    <string name="noti_connecting">Connecting to remote device</string>
+    <string name="noti_waiting">Waiting for file information</string>
+    <plurals name="noti_request_desc">
+        <item quantity="one">Wants to send %1$d file - %2$s</item>
+        <item quantity="other">Wants to send %1$d files - %2$s</item>
+    </plurals>
+    <string name="preparing_transmission">Preparing transmission</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
+    <string name="noti_recv_interrupted">Receiving process has been interrupted</string>
+    <string name="preparing">Preparing</string>
+    <plurals name="noti_complete">
+        <item quantity="one">Received %d file, tap to view</item>
+        <item quantity="other">Received %d files, tap to view</item>
+    </plurals>
+    <plurals name="noti_complete_partial">
+        <item quantity="one">Received %d file before interruption, tap to view</item>
+        <item quantity="other">Received %d files before interruption, tap to view</item>
+    </plurals>
+    <string name="stop">Stop</string>
+    <string name="noti_receiver_title">NaiveShare Receiver Service</string>
+    <string name="bluetooth_disabled">Bluetooth is disabled or unavailable</string>
+    <string name="receiving">Receiving</string>
+    <string name="recv_ok">Received completed</string>
+    <string name="recv_fail">Receiving interrupted</string>
+    <string name="receiver_started">Receiver started</string>
+    <string name="receiver_stopped">Receiver stopped</string>
+</resources>
