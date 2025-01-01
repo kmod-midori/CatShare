@@ -11,5 +11,5 @@ data class P2pInfo(
     val psk: String,
     val mac: String,
     val port: Int,
-    val key: String?,
+    val key: String? = null,
 ) : Parcelable
