@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "NaiveShare"
 include(":app")
- 
+include(":apistub")

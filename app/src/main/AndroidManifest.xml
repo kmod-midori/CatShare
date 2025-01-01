@@ -50,6 +50,23 @@
         android:theme="@style/Theme.NaiveShare"
         tools:targetApi="31">
         <activity
+            android:name=".ShareActivity"
+            android:exported="true"
+            android:label="@string/title_activity_share"
+            android:theme="@style/Theme.NaiveShare">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".StartReceiverActivity"
             android:exported="false"
             android:theme="@style/Theme.Transparent" />
@@ -89,7 +106,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
 
 </manifest>

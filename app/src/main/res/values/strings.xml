@@ -32,4 +32,9 @@
     <string name="recv_fail">Receiving interrupted</string>
     <string name="receiver_started">Receiver started</string>
     <string name="receiver_stopped">Receiver stopped</string>
+    <string name="shizuku_available">Shizuku is available</string>
+    <string name="shizuku_unavailable">Shizuku unavailable</string>
+    <string name="shizuku_desc">Shizuku is used to obtain your device\'s MAC address</string>
+    <string name="shizuku_not_granted">Shizuku permission not granted</string>
+    <string name="title_activity_share">ShareActivity</string>
 </resources>

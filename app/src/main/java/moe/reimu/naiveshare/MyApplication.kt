@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import moe.reimu.naiveshare.utils.NotificationUtils
 import moe.reimu.naiveshare.utils.TAG
+import rikka.sui.Sui
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MyApplication : Application() {

@@ -38,6 +38,7 @@ import moe.reimu.naiveshare.utils.BleUuids
 import moe.reimu.naiveshare.utils.JsonWithUnknownKeys
 import moe.reimu.naiveshare.utils.NotificationUtils
 import moe.reimu.naiveshare.utils.ServiceState
+import moe.reimu.naiveshare.utils.ShizukuUtils
 import moe.reimu.naiveshare.utils.TAG
 import moe.reimu.naiveshare.utils.checkBluetoothPermissions
 import moe.reimu.naiveshare.utils.getReceiverFlags
@@ -57,7 +58,7 @@ class GattServerService : Service() {
 
     private val localDeviceInfoLock = Object()
     private var localDeviceInfo = DeviceInfo(
-        0, bleSecurity.getEncodedPublicKey(), "11:22:33:44:55:66"
+        0, bleSecurity.getEncodedPublicKey(), "02:00:00:00:00:00"
     )
     private var localDeviceStatusBytes = Json.encodeToString(localDeviceInfo).toByteArray()
 
@@ -212,6 +213,12 @@ class GattServerService : Service() {
         }
         btAdvertiser = btAdapter.bluetoothLeAdvertiser
 
+        ShizukuUtils.getP2pMacAddress {
+            if (it != null) {
+                updateMacAddress(it)
+            }
+        }
+
         startAdv()
 
         registerReceiver(internalReceiver, internalIntentFilter, getReceiverFlags())
@@ -320,6 +327,18 @@ class GattServerService : Service() {
 
         gattServer?.close()
         gattServer = null
+    }
+
+    private fun updateMacAddress(mac: String) {
+        Log.i(TAG, "Updating local MAC address to $mac")
+        synchronized(localDeviceInfoLock) {
+            localDeviceInfo = DeviceInfo(
+                state = localDeviceInfo.state,
+                mac = mac,
+                key = localDeviceInfo.key
+            )
+            localDeviceStatusBytes = Json.encodeToString(localDeviceInfo).toByteArray()
+        }
     }
 
     companion object {

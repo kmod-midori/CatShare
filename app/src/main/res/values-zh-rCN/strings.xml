@@ -30,4 +30,8 @@
     <string name="recv_fail">接收中断</string>
     <string name="receiver_started">接收服务已启动</string>
     <string name="receiver_stopped">接收服务已停止</string>
+    <string name="shizuku_available">Shizuku 可用</string>
+    <string name="shizuku_unavailable">Shizuku 不可用</string>
+    <string name="shizuku_desc">本应用使用 Shizuku 获取您设备的 MAC 地址</string>
+    <string name="shizuku_not_granted">Shizuku 未授权</string>
 </resources>

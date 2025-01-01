@@ -6,12 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -51,11 +56,17 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import moe.reimu.naiveshare.services.GattServerService
+import moe.reimu.naiveshare.ui.DefaultCard
 import moe.reimu.naiveshare.ui.theme.NaiveShareTheme
 import moe.reimu.naiveshare.utils.ServiceState
+import moe.reimu.naiveshare.utils.ShizukuUtils
+import moe.reimu.naiveshare.utils.TAG
 import moe.reimu.naiveshare.utils.getReceiverFlags
+import rikka.shizuku.Shizuku
+import java.util.ArrayList
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,7 +80,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun checkAndRequestPermissions() {
+    private fun checkAndRequestPermissions() {
         val permissionsToRequest = mutableListOf<String>()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(
@@ -195,6 +206,50 @@ fun MainActivityContent() {
         }
     }
 
+    var shizukuGranted by remember {
+        mutableStateOf(false)
+    }
+
+    var shizukuAvailable by remember {
+        mutableStateOf(false)
+    }
+
+    DisposableEffect(Unit) {
+        val permissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
+            Log.d(TAG, "Shizuku grant result: $grantResult")
+            shizukuGranted = grantResult == PackageManager.PERMISSION_GRANTED
+        }
+
+        val binderRecvListener = Shizuku.OnBinderReceivedListener {
+            shizukuAvailable = true
+            shizukuGranted = Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+
+            ShizukuUtils.getP2pMacAddress {}
+        }
+
+        val binderDeadReceiver = Shizuku.OnBinderDeadListener {
+            shizukuAvailable = false
+        }
+
+        Shizuku.addRequestPermissionResultListener(permissionListener)
+        Shizuku.addBinderReceivedListenerSticky(binderRecvListener)
+        Shizuku.addBinderDeadListener(binderDeadReceiver)
+
+        onDispose {
+            Shizuku.removeRequestPermissionResultListener(permissionListener)
+            Shizuku.removeBinderReceivedListener(binderRecvListener)
+            Shizuku.removeBinderDeadListener(binderDeadReceiver)
+        }
+    }
+
+    val pickFilesLauncher = rememberLauncherForActivityResult(ChooseFilesContract()) { pickedUris ->
+        if (pickedUris.isNotEmpty()) {
+            val intent = Intent(context, ShareActivity::class.java)
+                .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(pickedUris))
+            context.startActivity(intent)
+        }
+    }
+
     val iconMod = Modifier
         .size(48.dp)
         .padding(end = 16.dp)
@@ -216,7 +271,7 @@ fun MainActivityContent() {
         ) {
             item {
                 DefaultCard(onClick = {
-                    Toast.makeText(context, R.string.not_impl, Toast.LENGTH_SHORT).show()
+                    pickFilesLauncher.launch()
                 }) {
                     Row(
                         modifier = Modifier.padding(16.dp),
@@ -271,28 +326,89 @@ fun MainActivityContent() {
                     }
                 }
             }
+            item {
+                DefaultCard(onClick = {
+                    if (!shizukuGranted) {
+                        Shizuku.requestPermission(0)
+                    }
+                }) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = if (shizukuAvailable && shizukuGranted) {
+                                ImageVector.vectorResource(R.drawable.ic_done)
+                            } else {
+                                ImageVector.vectorResource(R.drawable.ic_close)
+                            },
+                            contentDescription = null,
+                            modifier = iconMod,
+                        )
+                        Column {
+                            Text(
+                                text = stringResource(
+                                    if (shizukuAvailable) {
+                                        if (shizukuGranted) {
+                                            R.string.shizuku_available
+                                        } else {
+                                            R.string.shizuku_not_granted
+                                        }
+                                    } else {
+                                        R.string.shizuku_unavailable
+                                    }
+                                ),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(
+                                text = stringResource(R.string.shizuku_desc),
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-@Composable
-fun DefaultCard(
-    modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit
-) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ), modifier = modifier.fillMaxWidth(), content = content
-    )
-}
 
-@Composable
-fun DefaultCard(
-    onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit
-) {
-    Card(
-        onClick = onClick, colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ), modifier = modifier.fillMaxWidth(), content = content
-    )
+
+class ChooseFilesContract : ActivityResultContract<Void?, List<Uri>>() {
+    override fun createIntent(context: Context, input: Void?): Intent {
+        val cf = Intent(Intent.ACTION_GET_CONTENT)
+            .setType("*/*")
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        return Intent.createChooser(cf, "Choose files")
+    }
+
+    override fun getSynchronousResult(
+        context: Context,
+        input: Void?
+    ): SynchronousResult<List<Uri>>? =
+        null
+
+    override fun parseResult(resultCode: Int, intent: Intent?): List<Uri> {
+        if (intent == null) {
+            return emptyList()
+        }
+
+        val ret = mutableListOf<Uri>()
+
+        val clipData = intent.clipData
+        if (clipData != null) {
+            for (i in 0..<clipData.itemCount) {
+                clipData.getItemAt(i).uri?.let {
+                    ret.add(it)
+                }
+            }
+        } else {
+            intent.data?.let {
+                ret.add(it)
+            }
+        }
+
+        return ret
+    }
+
 }
