@@ -31,7 +31,7 @@ jobs:
         run: echo "${{ secrets.KEYSTORE_PROPERTIES }}" | base64 --decode > signing.properties
 
       - name: Build Application
-        run: ./gradlew --no-daemon build
+        run: ./gradlew --no-daemon assembleRelease lintRelease
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
@@ -43,10 +43,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lint-results
-          path: app/build/reports/lint-results.xml
+          path: app/build/reports/lint-results-release.xml
 
-      - name: Create Release
-        uses: actions/create-release@v1
+      - name: Release
+        uses: softprops/action-gh-release@v2
         with:
-          files: |
-            app/build/outputs/apk/release/app-release.apk
+          files: app/build/outputs/apk/release/app-release.apk
+          draft: true
