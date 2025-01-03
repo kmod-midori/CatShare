@@ -167,6 +167,7 @@ class GattServerService : Service() {
             if (ecKey != null) {
                 val cipher = BleSecurity.deriveSessionKey(ecKey)
                 p2pInfo = P2pInfo(
+                    id = BleUtils.getSenderId(),
                     ssid = cipher.decrypt(p2pInfo.ssid),
                     psk = cipher.decrypt(p2pInfo.psk),
                     mac = cipher.decrypt(p2pInfo.mac),
@@ -256,7 +257,7 @@ class GattServerService : Service() {
             addServiceData(
                 ParcelUuid.fromString(
                     String.format(
-                        "0000011e-0000-1000-8000-00805f9b34fb",
+                        "000001ff-0000-1000-8000-00805f9b34fb",
                         java.lang.Byte.valueOf(0),
                         java.lang.Byte.valueOf(0),
                     )
@@ -274,7 +275,7 @@ class GattServerService : Service() {
 
             data[26] = 1
 
-            addServiceData(ParcelUuid.fromString("00000204-0000-1000-8000-00805f9b34fb"), data)
+            addServiceData(ParcelUuid.fromString("0000ffff-0000-1000-8000-00805f9b34fb"), data)
         }.build()
 
         val params = AdvertisingSetParameters.Builder().apply {
