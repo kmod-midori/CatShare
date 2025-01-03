@@ -186,6 +186,15 @@ class GattServerService : Service() {
             return
         }
 
+        btManager = getSystemService(BluetoothManager::class.java)
+        val btAdapter = btManager.adapter
+        if (btAdapter == null || !btAdapter.isEnabled) {
+            NotificationUtils.showBluetoothToast(this)
+            stopSelf()
+            return
+        }
+        btAdvertiser = btAdapter.bluetoothLeAdvertiser
+
         try {
             startForeground(
                 NotificationUtils.GATT_SERVER_FG_ID,
@@ -201,15 +210,6 @@ class GattServerService : Service() {
             stopSelf()
             return
         }
-
-        btManager = getSystemService(BluetoothManager::class.java)
-        val btAdapter = btManager.adapter
-        if (btAdapter == null || !btAdapter.isEnabled) {
-            Toast.makeText(this, R.string.bluetooth_disabled, Toast.LENGTH_SHORT).show()
-            stopSelf()
-            return
-        }
-        btAdvertiser = btAdapter.bluetoothLeAdvertiser
 
         ShizukuUtils.getMacAddress("p2p0") {
             if (it != null) {

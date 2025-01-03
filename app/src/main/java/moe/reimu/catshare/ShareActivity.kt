@@ -57,14 +57,25 @@ import moe.reimu.catshare.ui.DefaultCard
 import moe.reimu.catshare.ui.theme.CatShareTheme
 import moe.reimu.catshare.utils.BleUtils
 import moe.reimu.catshare.utils.DeviceUtils
+import moe.reimu.catshare.utils.NotificationUtils
 import moe.reimu.catshare.utils.ShizukuUtils
 import moe.reimu.catshare.utils.TAG
 import java.nio.ByteBuffer
 import kotlin.random.Random
 
 class ShareActivity : ComponentActivity() {
+    private lateinit var bluetoothManager: BluetoothManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        bluetoothManager = getSystemService(BluetoothManager::class.java)
+        val adapter = bluetoothManager.adapter
+        if (adapter == null || !adapter.isEnabled) {
+            NotificationUtils.showBluetoothToast(this)
+            finish()
+            return
+        }
 
         val sharedUris = if (intent.action == Intent.ACTION_SEND) {
             val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)

@@ -1,0 +1,52 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Extract KeyStore
+        run: echo ${{ secrets.KEYSTORE }} | base64 --decode > keystore.jks
+
+      - name: Extract Signing Properties
+        run: echo ${{ secrets.KEYSTORE_PROPERTIES }} | base64 --decode > signing.properties
+
+      - name: Build Application
+        run: ./gradlew --no-daemon app:assembleRelease app:lintReportRelease
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload Lint Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results
+          path: app/build/reports/lint-results.xml
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          files: |
+            app/build/outputs/apk/release/app-release.apk

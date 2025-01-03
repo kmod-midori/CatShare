@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,13 +22,35 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            file("../signing.properties").let { propFile ->
+                if (propFile.canRead()) {
+                    val properties = Properties()
+                    properties.load(propFile.inputStream())
+
+                    storeFile = file(properties.getProperty("KEYSTORE_FILE"))
+                    storePassword = properties.getProperty("KEYSTORE_PASSWORD")
+                    keyAlias = properties.getProperty("SIGNING_KEY_ALIAS")
+                    keyPassword = properties.getProperty("SIGNING_KEY_PASSWORD")
+                } else {
+                    println("Unable to read signing.properties")
+                }
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {
@@ -61,12 +85,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
-    implementation("com.squareup.okhttp3:okhttp")
-    implementation("com.squareup.okhttp3:logging-interceptor")
-
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
-
     implementation("no.nordicsemi.android.kotlin.ble:client:1.1.0")
 
     implementation(libs.ktor.client.core)
