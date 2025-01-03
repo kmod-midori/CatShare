@@ -210,9 +210,12 @@ fun MainActivityContent() {
 
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = stringResource(R.string.app_name)) }, actions = {
-            IconButton(onClick = { /* do something */ }) {
+            IconButton(onClick = {
+                context.startActivity(Intent(context, SettingsActivity::class.java))
+            }) {
                 Icon(
-                    imageVector = Icons.Filled.Settings, contentDescription = "Settings"
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = stringResource(R.string.title_activity_settings)
                 )
             }
         })

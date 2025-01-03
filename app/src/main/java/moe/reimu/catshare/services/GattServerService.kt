@@ -30,6 +30,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import moe.reimu.catshare.AppSettings
 import moe.reimu.catshare.BleSecurity
 import moe.reimu.catshare.R
 import moe.reimu.catshare.models.DeviceInfo
@@ -269,9 +270,21 @@ class GattServerService : Service() {
             System.arraycopy(ByteArray(8), 0, data, 0, 8)
             System.arraycopy(BleUtils.RANDOM_DATA, 0, data, 8, 2)
 
-            val name = "Phone"
-            val nameRaw = name.toByteArray(Charsets.UTF_8)
-            System.arraycopy(nameRaw, 0, data, 10, min(nameRaw.size, 16))
+            val name = AppSettings(this@GattServerService).deviceName
+            var nameBytes = name.toByteArray(Charsets.UTF_8)
+            if (nameBytes.size > 15) {
+                var str = String(nameBytes.copyOf(15), Charsets.UTF_8)
+                var length = str.length - 1
+
+                // Scan backwards for char boundary
+                while (length >= 0 && !name.startsWith(str)) {
+                    str = str.substring(0, length)
+                    length -= 1
+                }
+
+                nameBytes = (str + "\t").toByteArray(Charsets.UTF_8)
+            }
+            System.arraycopy(nameBytes, 0, data, 10, min(nameBytes.size, 16))
 
             data[26] = 1
 

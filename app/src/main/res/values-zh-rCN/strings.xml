@@ -45,4 +45,7 @@
     <string name="no_file_shared">分享内容为空或无法读取</string>
     <string name="unknown">未知</string>
     <string name="choose_files">选择文件</string>
+    <string name="title_activity_settings">设置</string>
+    <string name="device_name">设备名称</string>
+    <string name="device_name_default_value">我的手机</string>
 </resources>

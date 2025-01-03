@@ -47,6 +47,7 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import moe.reimu.catshare.AppSettings
 import moe.reimu.catshare.BleSecurity
 import moe.reimu.catshare.BuildConfig
 import moe.reimu.catshare.exceptions.CancelledByUserException
@@ -166,12 +167,14 @@ class P2pSenderService : BaseP2pService() {
             }
         }
 
+        val settings = AppSettings(this@P2pSenderService)
+
         val taskObj =
             JSONObject()
                 .put("taskId", taskIdStr)
                 .put("id", taskIdStr)
                 .put("senderId", BleUtils.getSenderId())
-                .put("senderName", "Phone")
+                .put("senderName", settings.deviceName)
                 .put("fileName", task.files.first().name)
                 .put("mimeType", mimeType)
                 .put("fileCount", fileCount)
