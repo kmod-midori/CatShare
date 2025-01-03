@@ -389,6 +389,7 @@ class P2pSenderService : BaseP2pService() {
                         }
 
                         val newP2pInfo = P2pInfo(
+                            id = BleUtils.getSenderId(),
                             ssid = cipher?.encrypt(ssid) ?: ssid,
                             psk = cipher?.encrypt(psk) ?: psk,
                             mac = cipher?.encrypt(p2pMac) ?: p2pMac,

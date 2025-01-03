@@ -449,7 +449,7 @@ class P2pReceiverService : BaseP2pService() {
                         )
 
                         try {
-                            val st = WebSocketMessage.makeStatus(0, taskId, 1, "done")
+                            val st = WebSocketMessage.makeStatus(99, taskId, 1, "")
                             wsSession.send(Frame.Text(st.toText()))
                             wsSession.flush()
                         } catch (e: Throwable) {
@@ -478,7 +478,7 @@ class P2pReceiverService : BaseP2pService() {
 
                             val r = when (message.name.lowercase()) {
                                 "versionnegotiation" -> {
-                                    val inVersion = payload.optInt("version", 0)
+                                    val inVersion = payload.optInt("version", 1)
                                     val currentVersion = min(inVersion, 1)
 
                                     JSONObject()
@@ -593,6 +593,8 @@ class P2pReceiverService : BaseP2pService() {
                 break
             }
         }
+
+        Log.d(TAG, "Received ${receivedFiles.size} files")
 
         return receivedFiles
     }
