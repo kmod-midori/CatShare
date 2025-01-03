@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Parcelize
 data class P2pInfo(
+    val id: String?,
     val ssid: String,
     val psk: String,
     val mac: String,

@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -89,7 +90,7 @@ class ShareActivity : ComponentActivity() {
         }
 
         if (sharedUris.isEmpty()) {
-            Toast.makeText(this, "No file shared", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.no_file_shared, Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -173,7 +174,7 @@ fun ShareActivityContent(files: List<FileInfo>) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Choose recipients") })
+            TopAppBar(title = { Text(text = stringResource(R.string.choose_recipient)) })
         }
     ) { innerPadding ->
         LazyColumn(
@@ -184,7 +185,7 @@ fun ShareActivityContent(files: List<FileInfo>) {
         ) {
             if (discoveredDevices.isEmpty()) {
                 item {
-                    Text("Scanning for devices")
+                    Text(stringResource(R.string.scanning_desc))
                 }
             } else {
                 items(discoveredDevices, key = { it.id }) {
@@ -211,7 +212,7 @@ fun ShareActivityContent(files: List<FileInfo>) {
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
-                                    text = it.brand ?: "Unknown"
+                                    text = it.brand ?: stringResource(R.string.unknown)
                                 )
                             }
                         }

@@ -40,4 +40,9 @@
     <string name="noti_send_interrupted">文件发送已中断</string>
     <string name="send_ok">发送完成</string>
     <string name="app_busy_toast">正在进行其他发送/接收任务</string>
+    <string name="scanning_desc">正在扫描接收者，请对方开启互传功能。</string>
+    <string name="choose_recipient">选择接收者</string>
+    <string name="no_file_shared">分享内容为空或无法读取</string>
+    <string name="unknown">未知</string>
+    <string name="choose_files">选择文件</string>
 </resources>

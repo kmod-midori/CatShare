@@ -52,6 +52,7 @@ data class WebSocketMessage(
             id,
             "status",
             JSONObject().put("taskId", taskId).put("type", type).put("reason", reason)
+                .put("id", taskId)
         )
     }
 }

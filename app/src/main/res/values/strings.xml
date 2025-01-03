@@ -42,4 +42,9 @@
     <string name="noti_send_interrupted">Sending process has been interrupted</string>
     <string name="send_ok">Sending completed</string>
     <string name="app_busy_toast">Executing other sending/receiving tasks</string>
+    <string name="scanning_desc">Scanning for recipients</string>
+    <string name="choose_recipient">Choose recipients</string>
+    <string name="no_file_shared">No file shared or failed to read contents</string>
+    <string name="unknown">Unknown</string>
+    <string name="choose_files">Choose Files</string>
 </resources>

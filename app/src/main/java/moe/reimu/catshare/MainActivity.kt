@@ -78,29 +78,26 @@ class MainActivity : ComponentActivity() {
     private fun checkAndRequestPermissions() {
         val permissionsToRequest = mutableListOf<String>()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(
                 this, Manifest.permission.NEARBY_WIFI_DEVICES
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             permissionsToRequest.add(Manifest.permission.NEARBY_WIFI_DEVICES)
         }
 
-        if (Build.VERSION.SDK_INT <= 32) {
-            if (ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-            }
-
-            if (ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
         }
 
+        if (Build.VERSION.SDK_INT <= 32 && ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
 
         if (Build.VERSION.SDK_INT >= 31) {
             for (perm in listOf(
@@ -117,15 +114,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            if (ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-
         if (permissionsToRequest.isNotEmpty()) {
             requestPermissions(permissionsToRequest.toTypedArray(), 0)
         }
@@ -139,35 +127,9 @@ class MainActivity : ComponentActivity() {
                 continue
             }
 
-            when (name) {
-                Manifest.permission.ACCESS_FINE_LOCATION -> {
-                    Toast.makeText(this, "Location permission not granted", Toast.LENGTH_LONG)
-                        .show()
-                }
-
-                Manifest.permission.NEARBY_WIFI_DEVICES -> {
-                    Toast.makeText(this, "Nearby permission not granted", Toast.LENGTH_LONG).show()
-                }
-
-                Manifest.permission.BLUETOOTH_ADVERTISE -> {
-                    Toast.makeText(this, "Bluetooth advertise not granted", Toast.LENGTH_LONG)
-                        .show()
-                }
-
-                Manifest.permission.BLUETOOTH_SCAN -> {
-                    Toast.makeText(this, "Bluetooth scan not granted", Toast.LENGTH_LONG).show()
-                }
-
-                Manifest.permission.BLUETOOTH_CONNECT -> {
-                    Toast.makeText(this, "Bluetooth connect not granted", Toast.LENGTH_LONG).show()
-                }
-
-                else -> {
-                    throw RuntimeException("What?")
-                }
-            }
-
+            Toast.makeText(this, "${name} not granted", Toast.LENGTH_LONG).show()
             finish()
+
             return
         }
     }
@@ -370,7 +332,7 @@ class ChooseFilesContract : ActivityResultContract<Void?, List<Uri>>() {
             .setType("*/*")
             .addCategory(Intent.CATEGORY_OPENABLE)
             .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        return Intent.createChooser(cf, "Choose files")
+        return Intent.createChooser(cf, context.getString(R.string.choose_files))
     }
 
     override fun getSynchronousResult(

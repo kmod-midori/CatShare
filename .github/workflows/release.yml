@@ -31,7 +31,7 @@ jobs:
         run: echo "${{ secrets.KEYSTORE_PROPERTIES }}" | base64 --decode > signing.properties
 
       - name: Build Application
-        run: ./gradlew --no-daemon app:assembleRelease app:lintReportRelease
+        run: ./gradlew --no-daemon build
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
