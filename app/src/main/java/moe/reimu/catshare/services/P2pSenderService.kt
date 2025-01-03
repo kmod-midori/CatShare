@@ -244,6 +244,9 @@ class P2pSenderService : BaseP2pService() {
                                     }
                                 }
                             }
+                        } catch (e: Throwable) {
+                            Log.e(TAG, "WebSocket failed", e)
+                            throw e
                         } finally {
                             outgoing.close()
                         }
@@ -255,7 +258,9 @@ class P2pSenderService : BaseP2pService() {
                                 "action",
                                 0,
                                 "versionNegotiation",
-                                JSONObject().put("version", 1)
+                                JSONObject()
+                                    .put("version", 1)
+                                    .put("versions", listOf(1))
                             ).toText()
                         )
                     )

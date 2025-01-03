@@ -24,18 +24,14 @@
 
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
-
 -keepattributes Signature,InnerClasses
--keepclasseswithmembers class io.netty.** {
-    *;
-}
--keepnames class io.netty.** {
-    *;
-}
 
--keep class moe.reimu.catshare.services.* {
-    *;
-}
+-keep class moe.reimu.catshare.** { *; }
+
+-keep class io.netty.** { *; }
+-keep class io.ktor.** { *; }
+-keep class kotlinx.coroutines.** { *; }
+
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
