@@ -25,10 +25,10 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Extract KeyStore
-        run: echo ${{ secrets.KEYSTORE }} | base64 --decode > keystore.jks
+        run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > keystore.jks
 
       - name: Extract Signing Properties
-        run: echo ${{ secrets.KEYSTORE_PROPERTIES }} | base64 --decode > signing.properties
+        run: echo "${{ secrets.KEYSTORE_PROPERTIES }}" | base64 --decode > signing.properties
 
       - name: Build Application
         run: ./gradlew --no-daemon app:assembleRelease app:lintReportRelease
