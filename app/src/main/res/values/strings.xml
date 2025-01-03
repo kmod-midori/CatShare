@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NaiveShare</string>
+    <string name="app_name">CatShare</string>
     <string name="send">Send</string>
     <string name="discoverable">Discoverable</string>
     <string name="discoverable_desc">Others may send files to you</string>
@@ -25,7 +25,7 @@
         <item quantity="other">Received %d files before interruption, tap to view</item>
     </plurals>
     <string name="stop">Stop</string>
-    <string name="noti_receiver_title">NaiveShare Receiver Service</string>
+    <string name="noti_receiver_title">CatShare Receiver Service</string>
     <string name="bluetooth_disabled">Bluetooth is disabled or unavailable</string>
     <string name="receiving">Receiving</string>
     <string name="recv_ok">Received completed</string>

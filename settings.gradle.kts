@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "NaiveShare"
+rootProject.name = "CatShare"
 include(":app")
 include(":apistub")

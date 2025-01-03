@@ -1,4 +1,4 @@
-# NaiveShare
+# CatShare
 类原生 & 海外设备，现已加入互传联盟。
 
 ## 功能

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.NaiveShare" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.CatShare" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.Transparent" parent="android:Theme">
         <item name="android:windowIsTranslucent">true</item>

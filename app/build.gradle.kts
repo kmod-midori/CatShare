@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "moe.reimu.naiveshare"
+    namespace = "moe.reimu.catshare"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "moe.reimu.naiveshare"
+        applicationId = "moe.reimu.catshare"
         minSdk = 29
         targetSdk = 35
         versionCode = 1
