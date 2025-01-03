@@ -355,13 +355,12 @@ class P2pSenderService : BaseP2pService() {
             try {
                 groupInfoFuture = CompletableDeferred()
                 p2pManager.createGroupSuspend(p2pChannel, p2pConfig)
-                val newGroupInfo = groupInfoFuture.awaitWithTimeout(
+                groupInfoFuture.awaitWithTimeout(
                     Duration.ofSeconds(5),
                     "Waiting for P2P group info"
                 )
 
-                val p2pMac =
-                    ShizukuUtils.getMacAddress(newGroupInfo.`interface`) ?: "02:00:00:00:00:00"
+                val p2pMac = ShizukuUtils.getMacAddress("p2p0") ?: "02:00:00:00:00:00"
                 Log.d(TAG, "Advertised local MAC address: $p2pMac")
 
                 withTimeoutReason(Duration.ofSeconds(10), "BLE operations") {
