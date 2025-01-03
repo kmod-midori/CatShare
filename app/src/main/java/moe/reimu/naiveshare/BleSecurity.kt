@@ -11,32 +11,16 @@ import javax.crypto.KeyAgreement
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-class BleSecurity {
+object BleSecurity {
     private val localPrivateKey: ECPrivateKey
     private val localPublicKey: ECPublicKey
 
-    constructor() {
+    init {
         val kg = KeyPairGenerator.getInstance("EC")
         kg.initialize(256)
         val kp = kg.generateKeyPair()
         localPublicKey = kp.public as ECPublicKey
         localPrivateKey = kp.private as ECPrivateKey
-    }
-
-    constructor(publicKey: String) {
-        val kf = KeyFactory.getInstance("EC")
-        val otherPk =
-            kf.generatePublic(
-                X509EncodedKeySpec(
-                    Base64.getDecoder().decode(publicKey)
-                )
-            ) as ECPublicKey
-        val kg = KeyPairGenerator.getInstance("EC")
-        kg.initialize(otherPk.params)
-        val kp = kg.generateKeyPair()
-        localPublicKey = kp.public as ECPublicKey
-        localPrivateKey = kp.private as ECPrivateKey
-        deriveSessionKey(publicKey)
     }
 
     fun deriveSessionKey(publicKey: String): SessionCipher {

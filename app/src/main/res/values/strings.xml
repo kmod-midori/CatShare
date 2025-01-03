@@ -37,4 +37,9 @@
     <string name="shizuku_desc">Shizuku is used to obtain your device\'s MAC address</string>
     <string name="shizuku_not_granted">Shizuku permission not granted</string>
     <string name="title_activity_share">ShareActivity</string>
+    <string name="sending">Sending</string>
+    <string name="send_fail">Sending interrupted</string>
+    <string name="noti_send_interrupted">Sending process has been interrupted</string>
+    <string name="send_ok">Sending completed</string>
+    <string name="app_busy_toast">Executing other sending/receiving tasks</string>
 </resources>

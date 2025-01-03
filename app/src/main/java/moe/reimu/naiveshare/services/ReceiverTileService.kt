@@ -15,6 +15,7 @@ import moe.reimu.naiveshare.StartReceiverActivity
 import moe.reimu.naiveshare.utils.ServiceState
 import moe.reimu.naiveshare.utils.TAG
 import moe.reimu.naiveshare.utils.getReceiverFlags
+import moe.reimu.naiveshare.utils.registerInternalBroadcastReceiver
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -76,11 +77,12 @@ class ReceiverTileService : TileService() {
         Log.d(TAG, "onStartListening")
         setState(false)
 
-        receiver = MyReceiver(this)
-        registerReceiver(
-            receiver, IntentFilter().apply {
+        val r = MyReceiver(this)
+        receiver = r
+        registerInternalBroadcastReceiver(
+            r, IntentFilter().apply {
                 addAction(ServiceState.ACTION_UPDATE_RECEIVER_STATE)
-            }, getReceiverFlags()
+            }
         )
 
         sendBroadcast(ServiceState.getQueryIntent())

@@ -41,6 +41,13 @@ android {
         aidl = true
         buildConfig = true
     }
+
+    packaging {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/*.properties"
+        }
+    }
 }
 
 dependencies {
@@ -60,9 +67,15 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
+    implementation("no.nordicsemi.android.kotlin.ble:client:1.1.0")
+
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.ktor.network.tls.certificates)
 
     implementation(libs.kotlinx.serialization.json)
 

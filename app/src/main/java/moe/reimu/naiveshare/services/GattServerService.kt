@@ -34,7 +34,7 @@ import moe.reimu.naiveshare.BleSecurity
 import moe.reimu.naiveshare.R
 import moe.reimu.naiveshare.models.DeviceInfo
 import moe.reimu.naiveshare.models.P2pInfo
-import moe.reimu.naiveshare.utils.BleUuids
+import moe.reimu.naiveshare.utils.BleUtils
 import moe.reimu.naiveshare.utils.JsonWithUnknownKeys
 import moe.reimu.naiveshare.utils.NotificationUtils
 import moe.reimu.naiveshare.utils.ServiceState
@@ -54,11 +54,9 @@ class GattServerService : Service() {
 
     private var advertisingSet: AdvertisingSet? = null
 
-    private val bleSecurity = BleSecurity()
-
     private val localDeviceInfoLock = Object()
     private var localDeviceInfo = DeviceInfo(
-        0, bleSecurity.getEncodedPublicKey(), "02:00:00:00:00:00"
+        0, BleSecurity.getEncodedPublicKey(), "02:00:00:00:00:00"
     )
     private var localDeviceStatusBytes = Json.encodeToString(localDeviceInfo).toByteArray()
 
@@ -108,7 +106,7 @@ class GattServerService : Service() {
             offset: Int,
             characteristic: BluetoothGattCharacteristic
         ) {
-            if (characteristic.uuid != BleUuids.CHAR_STATUS_UUID) {
+            if (characteristic.uuid != BleUtils.CHAR_STATUS_UUID) {
                 gattServer?.sendResponse(device, requestId, 257, 0, null)
                 return
             }
@@ -133,7 +131,7 @@ class GattServerService : Service() {
             offset: Int,
             value: ByteArray
         ) {
-            if (characteristic.uuid != BleUuids.CHAR_P2P_UUID) {
+            if (characteristic.uuid != BleUtils.CHAR_P2P_UUID) {
                 if (responseNeeded) {
                     gattServer?.sendResponse(device, requestId, 257, 0, null)
                 }
@@ -167,7 +165,7 @@ class GattServerService : Service() {
             var p2pInfo: P2pInfo = JsonWithUnknownKeys.decodeFromString(data.decodeToString())
             val ecKey = p2pInfo.key
             if (ecKey != null) {
-                val cipher = bleSecurity.deriveSessionKey(ecKey)
+                val cipher = BleSecurity.deriveSessionKey(ecKey)
                 p2pInfo = P2pInfo(
                     ssid = cipher.decrypt(p2pInfo.ssid),
                     psk = cipher.decrypt(p2pInfo.psk),
@@ -213,7 +211,7 @@ class GattServerService : Service() {
         }
         btAdvertiser = btAdapter.bluetoothLeAdvertiser
 
-        ShizukuUtils.getP2pMacAddress {
+        ShizukuUtils.getMacAddress("p2p0") {
             if (it != null) {
                 updateMacAddress(it)
             }
@@ -254,7 +252,7 @@ class GattServerService : Service() {
         val advertiser = btAdvertiser ?: return
 
         val advData = AdvertiseData.Builder().apply {
-            addServiceUuid(ParcelUuid(BleUuids.ADV_SERVICE_UUID))
+            addServiceUuid(ParcelUuid(BleUtils.ADV_SERVICE_UUID))
             addServiceData(
                 ParcelUuid.fromString(
                     String.format(
@@ -262,13 +260,13 @@ class GattServerService : Service() {
                         java.lang.Byte.valueOf(0),
                         java.lang.Byte.valueOf(0),
                     )
-                ), Arrays.copyOfRange(BleUuids.RANDOM_DATA, 0, 6)
+                ), Arrays.copyOfRange(BleUtils.RANDOM_DATA, 0, 6)
             )
         }.build()
         val scanRespData = AdvertiseData.Builder().apply {
             val data = ByteArray(27)
             System.arraycopy(ByteArray(8), 0, data, 0, 8)
-            System.arraycopy(BleUuids.RANDOM_DATA, 0, data, 8, 2)
+            System.arraycopy(BleUtils.RANDOM_DATA, 0, data, 8, 2)
 
             val name = "Phone"
             val nameRaw = name.toByteArray(Charsets.UTF_8)
@@ -303,13 +301,13 @@ class GattServerService : Service() {
 
     private fun buildGattService(): BluetoothGattService {
         val svc = BluetoothGattService(
-            BleUuids.SERVICE_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY
+            BleUtils.SERVICE_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY
         )
         svc.addCharacteristic(
-            BluetoothGattCharacteristic(BleUuids.CHAR_STATUS_UUID, 10, 17)
+            BluetoothGattCharacteristic(BleUtils.CHAR_STATUS_UUID, 10, 17)
         )
         svc.addCharacteristic(
-            BluetoothGattCharacteristic(BleUuids.CHAR_P2P_UUID, 10, 17)
+            BluetoothGattCharacteristic(BleUtils.CHAR_P2P_UUID, 10, 17)
         )
         return svc
     }

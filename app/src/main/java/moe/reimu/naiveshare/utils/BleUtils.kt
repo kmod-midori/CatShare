@@ -7,7 +7,7 @@ import java.util.UUID
 import kotlin.math.abs
 
 
-object BleUuids {
+object BleUtils {
     val ADV_SERVICE_UUID = UUID.fromString("00003331-0000-1000-8000-008123456789")
     val SERVICE_UUID = UUID.fromString("00009955-0000-1000-8000-00805f9b34fb")
     val CHAR_STATUS_UUID = UUID.fromString("00009954-0000-1000-8000-00805f9b34fb")
@@ -20,5 +20,10 @@ object BleUuids {
             0,
             2
         )
+    }
+
+    fun getSenderId(): String {
+        val senderIdRaw = RANDOM_DATA[0].toInt().shl(8).or(RANDOM_DATA[1].toInt())
+        return String.format("%04x", senderIdRaw)
     }
 }

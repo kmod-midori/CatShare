@@ -1,8 +1,10 @@
 package moe.reimu.naiveshare.utils
 
 import android.content.Context
+import android.widget.Toast
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationManagerCompat
+import moe.reimu.naiveshare.R
 
 object NotificationUtils {
     const val RECEIVER_FG_CHAN_ID = "RECEIVER_FG"
@@ -12,6 +14,7 @@ object NotificationUtils {
 
     const val GATT_SERVER_FG_ID = 1
     const val RECEIVER_FG_ID = 2
+    const val SENDER_FG_ID = 3
 
     fun createChannels(context: Context) {
         val manager = NotificationManagerCompat.from(context)
@@ -36,5 +39,9 @@ object NotificationUtils {
         )
 
         manager.createNotificationChannelsCompat(channels)
+    }
+
+    fun showBusyToast(context: Context) {
+        Toast.makeText(context, R.string.app_busy_toast, Toast.LENGTH_LONG).show()
     }
 }

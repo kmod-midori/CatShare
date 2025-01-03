@@ -2,9 +2,9 @@ package moe.reimu.naiveshare.utils
 
 import android.content.ComponentName
 import android.content.ServiceConnection
-import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import kotlinx.coroutines.CompletableDeferred
 import moe.reimu.naiveshare.BuildConfig
 import moe.reimu.naiveshare.IMacAddressService
 import moe.reimu.naiveshare.services.MacAddressService
@@ -64,19 +64,19 @@ object ShizukuUtils {
         }
     }
 
-    fun unsafeGetP2pMacAddress(): String? {
+    fun unsafeGetMacAddress(name: String): String? {
         synchronized(binderLock) {
             val svc = macService
             if (svc == null) {
                 Log.d(TAG, "MAC service is null, trying to bind")
                 unsafeBindService()
             } else {
-                return svc.p2pMacAddress
+                return svc.getMacAddressByName(name)
             }
         }
 
         synchronized(serviceNotify) {
-            serviceNotify.wait(1000 * 60)
+            serviceNotify.wait(1000 * 20)
         }
 
         synchronized(binderLock) {
@@ -84,17 +84,25 @@ object ShizukuUtils {
         }
     }
 
-    fun getP2pMacAddress(l: (String?) -> Unit) {
+    fun getMacAddress(name: String, l: (String?) -> Unit) {
         val th = Thread {
             val res = try {
-                unsafeGetP2pMacAddress()
+                unsafeGetMacAddress(name)
             } catch (e: Throwable) {
-                Log.e(ShizukuUtils.TAG, "Failed to obtain P2P MAC address", e)
+                Log.e(ShizukuUtils.TAG, "Failed to obtain MAC address for $name", e)
                 null
             }
 
             l(res)
         }
         th.start()
+    }
+
+    suspend fun getMacAddress(name: String): String? {
+        val fut = CompletableDeferred<String?>()
+        getMacAddress(name) {
+            fut.complete(it)
+        }
+        return fut.await()
     }
 }

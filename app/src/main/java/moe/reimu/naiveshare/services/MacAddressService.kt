@@ -1,6 +1,5 @@
 package moe.reimu.naiveshare.services
 
-import android.os.IBinder
 import android.util.Log
 import moe.reimu.naiveshare.IMacAddressService
 import moe.reimu.naiveshare.utils.TAG
@@ -17,11 +16,15 @@ class MacAddressService: IMacAddressService.Stub() {
         exitProcess(0)
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun getP2pMacAddress(): String? {
+        return getMacAddressByName("p2p0")
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun getMacAddressByName(name: String): String? {
         val ifs = NetworkInterface.getNetworkInterfaces()
         for (intf in ifs) {
-            if (intf.name == "p2p0") {
+            if (intf.name == name) {
                 return intf.hardwareAddress?.toHexString(HexFormat {
                     bytes.byteSeparator = ":"
                 })

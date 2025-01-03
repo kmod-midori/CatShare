@@ -19,11 +19,9 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,8 +29,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,6 +58,7 @@ import moe.reimu.naiveshare.utils.ServiceState
 import moe.reimu.naiveshare.utils.ShizukuUtils
 import moe.reimu.naiveshare.utils.TAG
 import moe.reimu.naiveshare.utils.getReceiverFlags
+import moe.reimu.naiveshare.utils.registerInternalBroadcastReceiver
 import rikka.shizuku.Shizuku
 import java.util.ArrayList
 
@@ -194,10 +191,9 @@ fun MainActivityContent() {
             }
         }
 
-        context.registerReceiver(
+        context.registerInternalBroadcastReceiver(
             receiver,
             IntentFilter(ServiceState.ACTION_UPDATE_RECEIVER_STATE),
-            getReceiverFlags()
         )
         context.sendBroadcast(ServiceState.getQueryIntent())
 
@@ -223,8 +219,6 @@ fun MainActivityContent() {
         val binderRecvListener = Shizuku.OnBinderReceivedListener {
             shizukuAvailable = true
             shizukuGranted = Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
-
-            ShizukuUtils.getP2pMacAddress {}
         }
 
         val binderDeadReceiver = Shizuku.OnBinderDeadListener {
@@ -370,7 +364,6 @@ fun MainActivityContent() {
         }
     }
 }
-
 
 
 class ChooseFilesContract : ActivityResultContract<Void?, List<Uri>>() {

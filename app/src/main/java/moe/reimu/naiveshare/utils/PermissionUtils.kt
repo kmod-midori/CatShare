@@ -1,10 +1,15 @@
 package moe.reimu.naiveshare.utils
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
+import moe.reimu.naiveshare.BuildConfig
+
+val INTERNAL_BROADCAST_PERMISSION = "${BuildConfig.APPLICATION_ID}.INTERNAL_BROADCASTS"
 
 fun Context.checkBluetoothPermissions(): Boolean {
     if (Build.VERSION.SDK_INT <= 32) {
@@ -53,6 +58,10 @@ fun Context.checkP2pPermissions(): Boolean {
     }
 
     return true
+}
+
+fun Context.registerInternalBroadcastReceiver(receiver: BroadcastReceiver, filter: IntentFilter) {
+    registerReceiver(receiver, filter, INTERNAL_BROADCAST_PERMISSION, null, getReceiverFlags())
 }
 
 fun getReceiverFlags(): Int {

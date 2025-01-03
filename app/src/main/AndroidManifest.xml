@@ -38,6 +38,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <permission
+        android:name="${applicationId}.INTERNAL_BROADCASTS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.INTERNAL_BROADCASTS" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -49,6 +54,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NaiveShare"
         tools:targetApi="31">
+        <service
+            android:name=".services.P2pSenderService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"></service>
+
         <activity
             android:name=".ShareActivity"
             android:exported="true"
@@ -56,13 +67,16 @@
             android:theme="@style/Theme.NaiveShare">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="*/*" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
@@ -106,7 +120,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <provider
