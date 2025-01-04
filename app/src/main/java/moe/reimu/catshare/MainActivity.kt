@@ -286,7 +286,11 @@ fun MainActivityContent() {
             item {
                 DefaultCard(onClick = {
                     if (!shizukuGranted) {
-                        Shizuku.requestPermission(0)
+                        try {
+                            Shizuku.requestPermission(0)
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
                     }
                 }) {
                     Row(
