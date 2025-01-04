@@ -232,6 +232,11 @@ class P2pSenderService : BaseP2pService() {
                                                 )
                                             )
                                         }
+
+                                        val ackMsg = WebSocketMessage(
+                                            "ack", message.id, message.name, null
+                                        )
+                                        send(Frame.Text(ackMsg.toText()))
                                     }
 
                                     "ack" -> {
