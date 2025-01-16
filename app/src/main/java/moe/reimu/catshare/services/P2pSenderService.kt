@@ -185,6 +185,7 @@ class P2pSenderService : BaseP2pService() {
         val transferStartFuture = CompletableDeferred<Unit>()
         val statusFuture = CompletableDeferred<Pair<Int, String>>()
         val transferCompleteFuture = CompletableDeferred<Unit>()
+        val wsCloseFuture = CompletableDeferred<Unit>()
 
         val httpServer = embeddedServer(Netty, configure = {
             val keyStore = buildKeyStore {
@@ -278,6 +279,8 @@ class P2pSenderService : BaseP2pService() {
                         )
                     )
                     handshakeCompleteFuture.complete(Unit)
+
+                    wsCloseFuture.await()
                 }
 
                 get("/download") {
@@ -461,6 +464,7 @@ class P2pSenderService : BaseP2pService() {
                 p2pManager.removeGroup(p2pChannel)
             }
         } finally {
+            wsCloseFuture.complete(Unit)
             httpServer.stop(1000, 1000)
         }
     }
