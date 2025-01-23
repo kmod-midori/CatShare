@@ -1,0 +1,7 @@
+<h3>Features</h3>
+<ul>
+<li>Bluetooth discovery</li>
+<li>Receive file</li>
+<li>Send file (Shizuku required)</li>
+</ul>
+
