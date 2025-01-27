@@ -232,6 +232,7 @@ fun deviceScanner(): List<DiscoveredDevice> {
     LifecycleResumeEffect(context) {
         val manager = context.getSystemService(BluetoothManager::class.java)
         val adapter = manager.adapter
+        val devicesLock = Object()
 
         val callback = object : ScanCallback() {
             override fun onScanFailed(errorCode: Int) {
@@ -292,18 +293,20 @@ fun deviceScanner(): List<DiscoveredDevice> {
                     result.device, senderId, deviceName, brand, supports5Ghz
                 )
                 var replaced = false
-                val newList = discoveredDevices.map {
-                    if (it.id == senderId) {
-                        replaced = true
-                        newDevice
-                    } else {
-                        it
+                synchronized(devicesLock) {
+                    val newList = discoveredDevices.map {
+                        if (it.id == senderId) {
+                            replaced = true
+                            newDevice
+                        } else {
+                            it
+                        }
+                    }.toMutableList()
+                    if (!replaced) {
+                        newList.add(newDevice)
                     }
-                }.toMutableList()
-                if (!replaced) {
-                    newList.add(newDevice)
+                    discoveredDevices = newList
                 }
-                discoveredDevices = newList
             }
         }
 
