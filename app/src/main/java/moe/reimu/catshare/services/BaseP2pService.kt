@@ -17,6 +17,7 @@ abstract class BaseP2pService : Service() {
             onP2pBroadcast(intent)
         }
     }
+    private var p2pReceiverRegistered = false
 
     private val intentFilter = IntentFilter().apply {
         addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
@@ -32,13 +33,18 @@ abstract class BaseP2pService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
         registerReceiver(p2pReceiver, intentFilter, getReceiverFlags())
+        p2pReceiverRegistered = true
+
         p2pManager = getSystemService(WifiP2pManager::class.java)
         p2pChannel = p2pManager.initialize(this, mainLooper, null)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(p2pReceiver)
+        if (p2pReceiverRegistered) {
+            unregisterReceiver(p2pReceiver)
+        }
     }
 }
