@@ -3,6 +3,10 @@
 
 Android 目前已不再支持非系统应用获取手机的 MAC 地址等无法重置的序列号，但由于各品牌的互传功能通常为系统应用，互传联盟协议将设备的 MAC 地址作为其认证信息的一部分，目前暂时无法绕过。
 
+[<img src="https://f-droid.org/badge/get-it-on-zh-cn.png"
+    alt="Get it on F-Droid"
+    height="80">](https://f-droid.org/packages/moe.reimu.catshare)
+
 ## 功能
 - [x] 蓝牙发现
 - [x] 文件接收
