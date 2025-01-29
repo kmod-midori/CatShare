@@ -18,8 +18,6 @@ android {
         targetSdk = 35
         versionCode = 3
         versionName = "1.2"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -59,6 +57,10 @@ android {
 
             signingConfig = signingConfigs.findByName("release")
         }
+        debug {
+            applicationIdSuffix = ".debug"
+            resValue("string", "app_name", "CatShare (Debug)")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -82,7 +84,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -111,8 +112,6 @@ dependencies {
 
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
 
     compileOnly(project(":apistub"))
     debugImplementation(libs.androidx.ui.tooling)
