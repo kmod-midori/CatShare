@@ -97,7 +97,13 @@ class ShareActivity : ComponentActivity() {
 
         Log.i(TAG, "Shared ${sharedUris.size} files")
 
-        val fileInfos = sharedUris.mapNotNull { extractFileInfo(it) }
+        val fileInfos = try {
+            sharedUris.mapNotNull { extractFileInfo(it) }
+        } catch (e: Throwable) {
+            Toast.makeText(this, R.string.no_file_shared, Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
         ShizukuUtils.bindService()
 
@@ -118,8 +124,16 @@ class ShareActivity : ComponentActivity() {
         )
         return cr.query(uri, proj, null, null)?.use {
             if (it.moveToFirst()) {
+                val mimeIndex = it.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE)
                 FileInfo(
-                    uri, it.getString(0), it.getString(1), it.getInt(2)
+                    uri,
+                    it.getString(it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)),
+                    if (mimeIndex < 0) {
+                        "application/octet-stream"
+                    } else {
+                        it.getString(mimeIndex)
+                    },
+                    it.getInt(it.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE))
                 )
             } else {
                 null
