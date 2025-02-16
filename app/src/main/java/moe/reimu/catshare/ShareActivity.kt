@@ -222,7 +222,11 @@ fun ShareActivityContent(files: List<FileInfo>) {
                             )
                             Column {
                                 Text(
-                                    text = it.name,
+                                    text = if (BuildConfig.DEBUG) {
+                                        "${it.name} (${it.id}, ${it.device.address})"
+                                    } else {
+                                        it.name
+                                    },
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
@@ -283,7 +287,7 @@ fun deviceScanner(): List<DiscoveredDevice> {
                                 }
                             }
 
-                            val senderIdRaw = data[0].toInt().shl(8).or(data[1].toInt())
+                            val senderIdRaw = data[8].toInt().shl(8).or(data[9].toInt())
                             senderId = String.format("%04x", senderIdRaw)
 
                             var name = nameBuf.toByteArray().decodeToString()
