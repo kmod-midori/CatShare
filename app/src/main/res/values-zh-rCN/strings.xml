@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CatShare</string>
     <string name="send">发送</string>
     <string name="discoverable">可见</string>
     <string name="discoverable_desc">其他用户可向您发送文件</string>
@@ -48,4 +47,10 @@
     <string name="title_activity_settings">设置</string>
     <string name="device_name">设备名称</string>
     <string name="device_name_default_value">我的手机</string>
+    <string name="log_capture_failed">日志获取失败</string>
+    <string name="capture_logs">捕获日志</string>
+    <string name="capture_logs_desc">捕获调试日志以排查问题</string>
+    <string name="expand_for_details">展开此通知以查看详细信息</string>
+    <string name="verbose_name">显示详细错误信息</string>
+    <string name="verbose_desc">在发送或接受失败时显示详细错误信息，用于排查问题</string>
 </resources>

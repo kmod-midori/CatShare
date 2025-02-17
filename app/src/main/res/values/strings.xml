@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CatShare</string>
+    <string name="app_name" translatable="false">CatShare</string>
     <string name="send">Send</string>
     <string name="discoverable">Discoverable</string>
     <string name="discoverable_desc">Others may send files to you</string>
@@ -50,4 +50,10 @@
     <string name="title_activity_settings">Settings</string>
     <string name="device_name">Device Name</string>
     <string name="device_name_default_value">My Phone</string>
+    <string name="log_capture_failed">Failed to capture logs</string>
+    <string name="capture_logs">Capture Logs</string>
+    <string name="capture_logs_desc">Capture debug logs for troubleshooting</string>
+    <string name="expand_for_details">Expand this notification for details</string>
+    <string name="verbose_name">Show detailed errors</string>
+    <string name="verbose_desc">Show detailed error messages when sending or receiving fails, for troubleshooting</string>
 </resources>

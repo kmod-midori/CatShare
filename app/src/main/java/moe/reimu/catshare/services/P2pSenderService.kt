@@ -500,13 +500,13 @@ class P2pSenderService : BaseP2pService() {
                 Log.i(TAG, "Cancelled by user")
                 notificationManager.notify(
                     Random.nextInt(),
-                    createFailedNotification(task.device.name)
+                    createFailedNotification(task.device.name, e)
                 )
             } catch (e: Throwable) {
                 Log.e(TAG, "Failed to process task", e)
                 notificationManager.notify(
                     Random.nextInt(),
-                    createFailedNotification(task.device.name)
+                    createFailedNotification(task.device.name, e)
                 )
             } finally {
                 stopForeground(STOP_FOREGROUND_REMOVE)
@@ -583,7 +583,16 @@ class P2pSenderService : BaseP2pService() {
         return n.build()
     }
 
-    private fun createFailedNotification(targetName: String): Notification {
+    private fun createFailedNotification(targetName: String, exception: Throwable?): Notification {
+        if (AppSettings(this).verbose && exception != null) {
+            return createNotificationBuilder(R.drawable.ic_warning)
+                .setContentTitle(getString(R.string.send_fail))
+                .setSubText(targetName)
+                .setContentText(getString(R.string.expand_for_details))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(exception.stackTraceToString()))
+                .setAutoCancel(true)
+                .build()
+        }
         return createNotificationBuilder(R.drawable.ic_warning)
             .setContentTitle(getString(R.string.send_fail))
             .setSubText(targetName)

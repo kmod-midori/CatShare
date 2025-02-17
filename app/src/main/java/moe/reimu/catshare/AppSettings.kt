@@ -14,4 +14,10 @@ class AppSettings(private val context: Context) {
         set(value) {
             prefs.edit().putString("deviceName", value).apply()
         }
+
+    var verbose: Boolean
+        get() = prefs.getBoolean("verbose", false)
+        set(value) {
+            prefs.edit().putBoolean("verbose", value).apply()
+        }
 }

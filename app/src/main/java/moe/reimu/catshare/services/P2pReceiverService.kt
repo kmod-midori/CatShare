@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
+import moe.reimu.catshare.AppSettings
 import moe.reimu.catshare.BuildConfig
 import moe.reimu.catshare.FakeTrustManager
 import moe.reimu.catshare.MyApplication
@@ -126,7 +127,6 @@ class P2pReceiverService : BaseP2pService() {
     }
 
 
-
     private val currentTaskLock = Object()
     private var currentJob: Job? = null
     private var curreentTaskId: Int? = null
@@ -164,13 +164,13 @@ class P2pReceiverService : BaseP2pService() {
                 Log.i(TAG, "Cancelled by user")
                 notificationManager.notify(
                     Random.nextInt(),
-                    createFailedNotification()
+                    createFailedNotification(e)
                 )
             } catch (e: Throwable) {
                 Log.e(TAG, "Failed to process task", e)
                 notificationManager.notify(
                     Random.nextInt(),
-                    createFailedNotification()
+                    createFailedNotification(e)
                 )
             } finally {
                 stopForeground(STOP_FOREGROUND_REMOVE)
@@ -326,7 +326,14 @@ class P2pReceiverService : BaseP2pService() {
         return builder.build()
     }
 
-    private fun createFailedNotification(): Notification {
+    private fun createFailedNotification(exception: Throwable?): Notification {
+        if (AppSettings(this).verbose && exception != null) {
+            return createNotificationBuilder(R.drawable.ic_warning)
+                .setContentTitle(getString(R.string.recv_fail))
+                .setContentText(getString(R.string.expand_for_details))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(exception.stackTraceToString()))
+                .setAutoCancel(true).build()
+        }
         return createNotificationBuilder(R.drawable.ic_warning)
             .setContentTitle(getString(R.string.recv_fail))
             .setContentText(getString(R.string.noti_recv_interrupted))
@@ -409,7 +416,16 @@ class P2pReceiverService : BaseP2pService() {
                     }
 
                     if (userResponse != true) {
-                        wsSession.send(Frame.Text(WebSocketMessage.makeStatus(99, taskId, 3, "user refuse").toText()))
+                        wsSession.send(
+                            Frame.Text(
+                                WebSocketMessage.makeStatus(
+                                    99,
+                                    taskId,
+                                    3,
+                                    "user refuse"
+                                ).toText()
+                            )
+                        )
                         wsSession.flush()
                         throw CancelledByUserException()
                     }
