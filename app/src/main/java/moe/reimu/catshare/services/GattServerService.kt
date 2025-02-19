@@ -26,7 +26,6 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelUuid
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -42,7 +41,7 @@ import moe.reimu.catshare.utils.ServiceState
 import moe.reimu.catshare.utils.ShizukuUtils
 import moe.reimu.catshare.utils.TAG
 import moe.reimu.catshare.utils.checkBluetoothPermissions
-import moe.reimu.catshare.utils.getReceiverFlags
+import moe.reimu.catshare.utils.registerInternalBroadcastReceiver
 import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
@@ -75,12 +74,7 @@ class GattServerService : Service() {
             }
         }
     }
-
-    private val internalIntentFilter = IntentFilter().apply {
-        addAction(ServiceState.ACTION_QUERY_RECEIVER_STATE)
-        addAction(ServiceState.ACTION_STOP_SERVICE)
-    }
-
+    private var internalReceiverRegistered = false
 
     private val advSetCallback = object : AdvertisingSetCallback() {
         override fun onAdvertisingSetStarted(
@@ -188,14 +182,19 @@ class GattServerService : Service() {
             return
         }
 
-        btManager = getSystemService(BluetoothManager::class.java)
-        val btAdapter = btManager.adapter
-        if (btAdapter == null || !btAdapter.isEnabled) {
+        try {
+            btManager = getSystemService(BluetoothManager::class.java)
+            val btAdapter = btManager.adapter
+            if (btAdapter == null || !btAdapter.isEnabled) {
+                throw IllegalStateException("Bluetooth not enabled")
+            }
+            btAdvertiser = btAdapter.bluetoothLeAdvertiser
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize BT", e)
             NotificationUtils.showBluetoothToast(this)
             stopSelf()
             return
         }
-        btAdvertiser = btAdapter.bluetoothLeAdvertiser
 
         try {
             startForeground(
@@ -221,7 +220,11 @@ class GattServerService : Service() {
 
         startAdv()
 
-        registerReceiver(internalReceiver, internalIntentFilter, getReceiverFlags())
+        registerInternalBroadcastReceiver(internalReceiver, IntentFilter().apply {
+            addAction(ServiceState.ACTION_QUERY_RECEIVER_STATE)
+            addAction(ServiceState.ACTION_STOP_SERVICE)
+        })
+        internalReceiverRegistered = true
         sendBroadcast(ServiceState.getUpdateIntent(true))
     }
 
@@ -329,15 +332,27 @@ class GattServerService : Service() {
     @SuppressLint("MissingPermission")
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(internalReceiver)
+        if (internalReceiverRegistered) {
+            unregisterReceiver(internalReceiver)
+        }
         sendBroadcast(ServiceState.getUpdateIntent(false))
 
-        advertisingSet?.run {
-            btAdvertiser?.stopAdvertisingSet(advSetCallback)
+        try {
+            advertisingSet?.run {
+                btAdvertiser?.stopAdvertisingSet(advSetCallback)
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop advertising", e)
         }
         advertisingSet = null
 
-        gattServer?.close()
+
+        try {
+            gattServer?.close()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop GATT server", e)
+        }
         gattServer = null
     }
 

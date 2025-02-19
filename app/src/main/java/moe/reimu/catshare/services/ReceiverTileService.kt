@@ -77,12 +77,12 @@ class ReceiverTileService : TileService() {
         setState(false)
 
         val r = MyReceiver(this)
-        receiver = r
         registerInternalBroadcastReceiver(
             r, IntentFilter().apply {
                 addAction(ServiceState.ACTION_UPDATE_RECEIVER_STATE)
             }
         )
+        receiver = r
 
         sendBroadcast(ServiceState.getQueryIntent())
     }

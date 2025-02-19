@@ -58,7 +58,6 @@ import moe.reimu.catshare.models.ReceivedFile
 import moe.reimu.catshare.models.WebSocketMessage
 import moe.reimu.catshare.utils.NotificationUtils
 import moe.reimu.catshare.utils.ProgressCounter
-import moe.reimu.catshare.utils.ServiceState
 import moe.reimu.catshare.utils.TAG
 import moe.reimu.catshare.utils.awaitWithTimeout
 import moe.reimu.catshare.utils.checkP2pPermissions
@@ -87,6 +86,7 @@ class P2pReceiverService : BaseP2pService() {
             }
         }
     }
+    private var internalReceiverRegistered = false
 
     override fun onCreate() {
         super.onCreate()
@@ -103,6 +103,7 @@ class P2pReceiverService : BaseP2pService() {
         registerInternalBroadcastReceiver(internalReceiver, IntentFilter().apply {
             addAction(ACTION_CANCEL_RECEIVING)
         })
+        internalReceiverRegistered = true
     }
 
     private var p2pFuture = CompletableDeferred<Pair<WifiP2pInfo, WifiP2pGroup>>()
@@ -652,9 +653,9 @@ class P2pReceiverService : BaseP2pService() {
 
         Log.d(TAG, "onDestroy")
 
-        sendBroadcast(ServiceState.getUpdateIntent(false))
-
-        unregisterReceiver(internalReceiver)
+        if (internalReceiverRegistered) {
+            unregisterReceiver(internalReceiver)
+        }
     }
 
     companion object {
