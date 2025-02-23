@@ -23,7 +23,13 @@ class P2pFutureActionListener: WifiP2pManager.ActionListener {
     }
 
     override fun onFailure(reason: Int) {
-        deferred.completeExceptionally(RuntimeException("Operation failed with code $reason"))
+        val message = when (reason) {
+            WifiP2pManager.ERROR -> "ERROR"
+            WifiP2pManager.P2P_UNSUPPORTED -> "P2P_UNSUPPORTED"
+            WifiP2pManager.BUSY -> "BUSY"
+            else -> "code $reason"
+        }
+        deferred.completeExceptionally(RuntimeException("WiFi P2P operation failed: $message"))
     }
 }
 
@@ -31,18 +37,30 @@ class P2pFutureActionListener: WifiP2pManager.ActionListener {
 suspend fun WifiP2pManager.createGroupSuspend(channel: WifiP2pManager.Channel, config: WifiP2pConfig) {
     val l = P2pFutureActionListener()
     createGroup(channel, config, l)
-    l.deferred.await()
+    try {
+        l.deferred.await()
+    } catch (e: Throwable) {
+        throw RuntimeException("Failed to create P2P group", e)
+    }
 }
 
-suspend fun WifiP2pManager.removeGroup(channel: WifiP2pManager.Channel) {
+suspend fun WifiP2pManager.removeGroupSuspend(channel: WifiP2pManager.Channel) {
     val l = P2pFutureActionListener()
     removeGroup(channel, l)
-    l.deferred.await()
+    try {
+        l.deferred.await()
+    } catch (e: Throwable) {
+        throw RuntimeException("Failed to remove P2P group", e)
+    }
 }
 
 @SuppressLint("MissingPermission")
 suspend fun WifiP2pManager.connectSuspend(channel: WifiP2pManager.Channel, config: WifiP2pConfig) {
     val l = P2pFutureActionListener()
     connect(channel, config, l)
-    l.deferred.await()
+    try {
+        l.deferred.await()
+    } catch (e: Throwable) {
+        throw RuntimeException("Failed to connect P2P", e)
+    }
 }

@@ -66,7 +66,7 @@ import moe.reimu.catshare.utils.TAG
 import moe.reimu.catshare.utils.awaitWithTimeout
 import moe.reimu.catshare.utils.createGroupSuspend
 import moe.reimu.catshare.utils.registerInternalBroadcastReceiver
-import moe.reimu.catshare.utils.removeGroup
+import moe.reimu.catshare.utils.removeGroupSuspend
 import moe.reimu.catshare.utils.requestGroupInfo
 import moe.reimu.catshare.utils.withTimeoutReason
 import no.nordicsemi.android.kotlin.ble.client.main.callback.ClientBleGatt
@@ -351,7 +351,7 @@ class P2pSenderService : BaseP2pService() {
             val groupInfo = p2pManager.requestGroupInfo(p2pChannel)
             if (groupInfo != null) {
                 Log.i(TAG, "Removing existing group: $groupInfo")
-                p2pManager.removeGroup(p2pChannel)
+                p2pManager.removeGroupSuspend(p2pChannel)
             }
 
             val ssid = "DIRECT-${DeviceUtils.getRandomChars(8)}"
@@ -461,7 +461,7 @@ class P2pSenderService : BaseP2pService() {
                     throw TimeoutException("Status timed out")
                 }
             } finally {
-                p2pManager.removeGroup(p2pChannel)
+                p2pManager.removeGroupSuspend(p2pChannel)
             }
         } finally {
             wsCloseFuture.complete(Unit)

@@ -63,6 +63,8 @@ import moe.reimu.catshare.utils.awaitWithTimeout
 import moe.reimu.catshare.utils.checkP2pPermissions
 import moe.reimu.catshare.utils.connectSuspend
 import moe.reimu.catshare.utils.registerInternalBroadcastReceiver
+import moe.reimu.catshare.utils.removeGroupSuspend
+import moe.reimu.catshare.utils.requestGroupInfo
 import okhttp3.ConnectionPool
 import org.json.JSONObject
 import java.io.File
@@ -371,6 +373,11 @@ class P2pReceiverService : BaseP2pService() {
 
         try {
             p2pFuture = CompletableDeferred()
+            val groupInfo = p2pManager.requestGroupInfo(p2pChannel)
+            if (groupInfo != null) {
+                Log.i(TAG, "A P2P group already exists, trying to remove")
+                p2pManager.removeGroupSuspend(p2pChannel)
+            }
             p2pManager.connectSuspend(p2pChannel, p2pConfig)
             try {
                 val (wifiP2pInfo, wifiP2pGroup) = p2pFuture.awaitWithTimeout(
