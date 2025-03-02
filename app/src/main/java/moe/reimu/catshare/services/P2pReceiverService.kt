@@ -53,6 +53,7 @@ import moe.reimu.catshare.FakeTrustManager
 import moe.reimu.catshare.MyApplication
 import moe.reimu.catshare.R
 import moe.reimu.catshare.exceptions.CancelledByUserException
+import moe.reimu.catshare.exceptions.ExceptionWithMessage
 import moe.reimu.catshare.models.P2pInfo
 import moe.reimu.catshare.models.ReceivedFile
 import moe.reimu.catshare.models.WebSocketMessage
@@ -339,7 +340,13 @@ class P2pReceiverService : BaseP2pService() {
         }
         return createNotificationBuilder(R.drawable.ic_warning)
             .setContentTitle(getString(R.string.recv_fail))
-            .setContentText(getString(R.string.noti_recv_interrupted))
+            .setContentText(
+                if (exception != null && exception is ExceptionWithMessage) {
+                    exception.getMessage(this)
+                } else {
+                    getString(R.string.noti_send_interrupted)
+                }
+            )
             .setAutoCancel(true).build()
     }
 
@@ -381,7 +388,7 @@ class P2pReceiverService : BaseP2pService() {
             p2pManager.connectSuspend(p2pChannel, p2pConfig)
             try {
                 val (wifiP2pInfo, wifiP2pGroup) = p2pFuture.awaitWithTimeout(
-                    Duration.ofSeconds(10), "Waiting for P2P connect"
+                    Duration.ofSeconds(10), "Waiting for P2P connect", R.string.error_p2p_failed
                 )
 
                 val hostPort = "${wifiP2pInfo.groupOwnerAddress.hostAddress}:${p2pInfo.port}"
@@ -393,7 +400,8 @@ class P2pReceiverService : BaseP2pService() {
 
                 val downloadJob = async {
                     val sendRequestPayload = sendRequestFuture.awaitWithTimeout(
-                        Duration.ofSeconds(5), "Waiting for send request"
+                        Duration.ofSeconds(5), "Waiting for send request",
+                        R.string.err_recv_req_timeout
                     )
 
                     val taskId = sendRequestPayload.optString(

@@ -53,6 +53,7 @@ import moe.reimu.catshare.BuildConfig
 import moe.reimu.catshare.exceptions.CancelledByUserException
 import moe.reimu.catshare.MyApplication
 import moe.reimu.catshare.R
+import moe.reimu.catshare.exceptions.ExceptionWithMessage
 import moe.reimu.catshare.models.DeviceInfo
 import moe.reimu.catshare.models.P2pInfo
 import moe.reimu.catshare.models.TaskInfo
@@ -370,13 +371,18 @@ class P2pSenderService : BaseP2pService() {
                 p2pManager.createGroupSuspend(p2pChannel, p2pConfig)
                 groupInfoFuture.awaitWithTimeout(
                     Duration.ofSeconds(5),
-                    "Waiting for P2P group info"
+                    "Waiting for P2P group info",
+                    R.string.error_p2p_failed
                 )
 
                 val p2pMac = ShizukuUtils.getMacAddress("p2p0") ?: "02:00:00:00:00:00"
                 Log.d(TAG, "Advertised local MAC address: $p2pMac")
 
-                withTimeoutReason(Duration.ofSeconds(10), "BLE operations") {
+                withTimeoutReason(
+                    Duration.ofSeconds(10),
+                    "BLE operations",
+                    R.string.error_bt_failed
+                ) {
                     var gBleClient: ClientBleGatt? = null
                     try {
                         val bleClient = ClientBleGatt.connect(
@@ -429,15 +435,18 @@ class P2pSenderService : BaseP2pService() {
                 val transferJob = async {
                     websocketConnectFuture.awaitWithTimeout(
                         Duration.ofSeconds(10),
-                        "Waiting for WS connect"
+                        "Waiting for WS connect",
+                        R.string.error_send_timeout_ws
                     )
                     handshakeCompleteFuture.awaitWithTimeout(
                         Duration.ofSeconds(5),
-                        "Waiting for handshake"
+                        "Waiting for handshake",
+                        R.string.error_send_timeout_handshake
                     )
                     transferStartFuture.awaitWithTimeout(
                         Duration.ofSeconds(30),
-                        "Waiting for start transfer"
+                        "Waiting for start transfer",
+                        R.string.error_send_timeout_handshake
                     )
                     transferCompleteFuture.await()
                     withTimeoutOrNull(5000L) {
@@ -596,7 +605,13 @@ class P2pSenderService : BaseP2pService() {
         return createNotificationBuilder(R.drawable.ic_warning)
             .setContentTitle(getString(R.string.send_fail))
             .setSubText(targetName)
-            .setContentText(getString(R.string.noti_send_interrupted))
+            .setContentText(
+                if (exception != null && exception is ExceptionWithMessage) {
+                    exception.getMessage(this)
+                } else {
+                    getString(R.string.noti_send_interrupted)
+                }
+            )
             .setAutoCancel(true)
             .build()
     }

@@ -53,4 +53,9 @@
     <string name="expand_for_details">展开此通知以查看详细信息</string>
     <string name="verbose_name">显示详细错误信息</string>
     <string name="verbose_desc">在发送或接受失败时显示详细错误信息，用于排查问题</string>
+    <string name="error_p2p_failed">点对点连接建立失败</string>
+    <string name="error_bt_failed">蓝牙通信失败</string>
+    <string name="err_recv_req_timeout">等待发送请求超时</string>
+    <string name="error_send_timeout_ws">WebSocket 连接超时</string>
+    <string name="error_send_timeout_handshake">发送握手超时</string>
 </resources>

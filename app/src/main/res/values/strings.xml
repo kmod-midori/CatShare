@@ -56,4 +56,9 @@
     <string name="expand_for_details">Expand this notification for details</string>
     <string name="verbose_name">Show detailed errors</string>
     <string name="verbose_desc">Show detailed error messages when sending or receiving fails, for troubleshooting</string>
+    <string name="error_p2p_failed">Failed to create WiFi P2P connection</string>
+    <string name="error_bt_failed">Bluetooth communication failed</string>
+    <string name="err_recv_req_timeout">Timed out waiting for request</string>
+    <string name="error_send_timeout_ws">Timeout waiting for WebSocket connection</string>
+    <string name="error_send_timeout_handshake">Timeout waiting for handshake</string>
 </resources>

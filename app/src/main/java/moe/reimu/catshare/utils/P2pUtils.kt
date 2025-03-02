@@ -5,6 +5,8 @@ import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pGroup
 import android.net.wifi.p2p.WifiP2pManager
 import kotlinx.coroutines.CompletableDeferred
+import moe.reimu.catshare.R
+import moe.reimu.catshare.exceptions.ExceptionWithMessage
 
 @SuppressLint("MissingPermission")
 suspend fun WifiP2pManager.requestGroupInfo(channel: WifiP2pManager.Channel): WifiP2pGroup? {
@@ -15,7 +17,7 @@ suspend fun WifiP2pManager.requestGroupInfo(channel: WifiP2pManager.Channel): Wi
     return groupInfoFuture.await()
 }
 
-class P2pFutureActionListener: WifiP2pManager.ActionListener {
+class P2pFutureActionListener : WifiP2pManager.ActionListener {
     val deferred = CompletableDeferred<Unit>()
 
     override fun onSuccess() {
@@ -34,13 +36,16 @@ class P2pFutureActionListener: WifiP2pManager.ActionListener {
 }
 
 @SuppressLint("MissingPermission")
-suspend fun WifiP2pManager.createGroupSuspend(channel: WifiP2pManager.Channel, config: WifiP2pConfig) {
+suspend fun WifiP2pManager.createGroupSuspend(
+    channel: WifiP2pManager.Channel,
+    config: WifiP2pConfig
+) {
     val l = P2pFutureActionListener()
     createGroup(channel, config, l)
     try {
         l.deferred.await()
     } catch (e: Throwable) {
-        throw RuntimeException("Failed to create P2P group", e)
+        throw ExceptionWithMessage("Failed to create P2P group", e, R.string.error_p2p_failed)
     }
 }
 
@@ -50,7 +55,7 @@ suspend fun WifiP2pManager.removeGroupSuspend(channel: WifiP2pManager.Channel) {
     try {
         l.deferred.await()
     } catch (e: Throwable) {
-        throw RuntimeException("Failed to remove P2P group", e)
+        throw ExceptionWithMessage("Failed to remove P2P group", e, R.string.error_p2p_failed)
     }
 }
 
@@ -61,6 +66,6 @@ suspend fun WifiP2pManager.connectSuspend(channel: WifiP2pManager.Channel, confi
     try {
         l.deferred.await()
     } catch (e: Throwable) {
-        throw RuntimeException("Failed to connect P2P", e)
+        throw ExceptionWithMessage("Failed to connect P2P", e, R.string.error_p2p_failed)
     }
 }
