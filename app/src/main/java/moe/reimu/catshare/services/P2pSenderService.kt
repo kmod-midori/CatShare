@@ -42,6 +42,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withTimeoutOrNull
@@ -130,7 +131,7 @@ class P2pSenderService : BaseP2pService() {
                 )
 
                 if (group != null) {
-                    groupInfoFuture?.complete(group)
+                    groupInfoFuture.complete(group)
                 }
 
                 Log.d(P2pSenderService.TAG, "P2P info: $connInfo, P2P group: $group")
@@ -180,6 +181,14 @@ class P2pSenderService : BaseP2pService() {
                 .put("mimeType", mimeType)
                 .put("fileCount", fileCount)
                 .put("totalSize", totalSize)
+
+        val sharedTextContent = if (task.files.size == 1 && task.files[0].textContent != null) {
+            val tc = task.files[0].textContent
+            taskObj.put("catShareText", tc)
+            tc
+        } else {
+            null
+        }
 
         val websocketConnectFuture = CompletableDeferred<Unit>()
         val handshakeCompleteFuture = CompletableDeferred<Unit>()
@@ -303,6 +312,13 @@ class P2pSenderService : BaseP2pService() {
                     call.respondOutputStream(ContentType.Application.Zip, HttpStatusCode.OK) {
                         val cr = contentResolver
                         ZipOutputStream(this).use { zo ->
+                            if (sharedTextContent != null) {
+                                zo.putNextEntry(ZipEntry("0/sharedText.txt"))
+                                zo.write(sharedTextContent.toByteArray(Charsets.UTF_8))
+                                zo.closeEntry()
+                                return@use
+                            }
+
                             for ((i, rf) in task.files.withIndex()) {
                                 cr.openInputStream(rf.uri)!!.use { ist ->
                                     zo.putNextEntry(ZipEntry("$i/${rf.name}"))
@@ -419,7 +435,8 @@ class P2pSenderService : BaseP2pService() {
                             } else {
                                 null
                             },
-                            port = serverPort
+                            port = serverPort,
+                            catShare = BuildConfig.VERSION_CODE,
                         )
 
                         p2pInfoChar.write(
@@ -453,9 +470,9 @@ class P2pSenderService : BaseP2pService() {
                         statusFuture.await()
                     }
                 }
-                val status = select<Pair<Int, String>?> {
-                    transferJob.onAwait { it }
+                val status = select {
                     statusFuture.onAwait { it }
+                    transferJob.onAwait { it }
                 }
 
                 if (status != null) {
@@ -463,6 +480,8 @@ class P2pSenderService : BaseP2pService() {
                         throw CancelledByUserException()
                     }
                     if (status.first == 1) {
+                        delay(1000)
+                        transferJob.cancel()
                         return@coroutineScope
                     }
                     throw RuntimeException("Transfer terminated with $status")
@@ -470,7 +489,12 @@ class P2pSenderService : BaseP2pService() {
                     throw TimeoutException("Status timed out")
                 }
             } finally {
-                p2pManager.removeGroupSuspend(p2pChannel)
+                try {
+                    p2pManager.removeGroupSuspend(p2pChannel)
+                } catch (e: Throwable) {
+                    // Ignore
+                    e.printStackTrace()
+                }
             }
         } finally {
             wsCloseFuture.complete(Unit)

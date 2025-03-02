@@ -31,6 +31,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import moe.reimu.catshare.AppSettings
 import moe.reimu.catshare.BleSecurity
+import moe.reimu.catshare.BuildConfig
 import moe.reimu.catshare.R
 import moe.reimu.catshare.models.DeviceInfo
 import moe.reimu.catshare.models.P2pInfo
@@ -56,7 +57,7 @@ class GattServerService : Service() {
 
     private val localDeviceInfoLock = Object()
     private var localDeviceInfo = DeviceInfo(
-        0, BleSecurity.getEncodedPublicKey(), "02:00:00:00:00:00"
+        0, BleSecurity.getEncodedPublicKey(), "02:00:00:00:00:00", BuildConfig.VERSION_CODE
     )
     private var localDeviceStatusBytes = Json.encodeToString(localDeviceInfo).toByteArray()
 
@@ -167,7 +168,8 @@ class GattServerService : Service() {
                     psk = cipher.decrypt(p2pInfo.psk),
                     mac = cipher.decrypt(p2pInfo.mac),
                     port = p2pInfo.port,
-                    key = null
+                    key = null,
+                    catShare = BuildConfig.VERSION_CODE,
                 )
             }
             startService(P2pReceiverService.getIntent(this@GattServerService, p2pInfo))
@@ -362,7 +364,8 @@ class GattServerService : Service() {
             localDeviceInfo = DeviceInfo(
                 state = localDeviceInfo.state,
                 mac = mac,
-                key = localDeviceInfo.key
+                key = localDeviceInfo.key,
+                catShare = BuildConfig.VERSION_CODE,
             )
             localDeviceStatusBytes = Json.encodeToString(localDeviceInfo).toByteArray()
         }

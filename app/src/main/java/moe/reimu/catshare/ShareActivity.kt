@@ -78,32 +78,36 @@ class ShareActivity : ComponentActivity() {
             return
         }
 
-        val sharedUris = if (intent.action == Intent.ACTION_SEND) {
-            val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-            if (uri != null) {
-                listOf(uri)
-            } else {
-                emptyList()
-            }
-        } else {
-            intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM) ?: emptyList()
-        }
-
-        if (sharedUris.isEmpty()) {
-            Toast.makeText(this, R.string.no_file_shared, Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        Log.i(TAG, "Shared ${sharedUris.size} files")
-
         val fileInfos = try {
-            sharedUris.mapNotNull { extractFileInfo(it) }
+            if (intent.action == Intent.ACTION_SEND) {
+                val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                if (uri != null) {
+                    listOf(uri).mapNotNull { extractFileInfo(it) }
+                } else {
+                    val text = intent.getStringExtra(Intent.EXTRA_TEXT)
+                    listOf(
+                        FileInfo(
+                            Uri.EMPTY, "", "", 0, text
+                        )
+                    )
+                }
+            } else {
+                val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                uris?.mapNotNull { extractFileInfo(it) } ?: emptyList()
+            }
         } catch (e: Throwable) {
             Toast.makeText(this, R.string.no_file_shared, Toast.LENGTH_SHORT).show()
             finish()
             return
         }
+
+        if (fileInfos.isEmpty()) {
+            Toast.makeText(this, R.string.no_file_shared, Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        Log.i(TAG, "Shared ${fileInfos.size} files")
 
         ShizukuUtils.bindService()
 
@@ -133,7 +137,8 @@ class ShareActivity : ComponentActivity() {
                     } else {
                         it.getString(mimeIndex)
                     },
-                    it.getInt(it.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE))
+                    it.getInt(it.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)),
+                    null
                 )
             } else {
                 null

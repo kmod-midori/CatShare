@@ -58,4 +58,6 @@
     <string name="err_recv_req_timeout">等待发送请求超时</string>
     <string name="error_send_timeout_ws">WebSocket 连接超时</string>
     <string name="error_send_timeout_handshake">发送握手超时</string>
+    <string name="noti_request_desc_text">请求发送文本</string>
+    <string name="msg_copied_to_clipboard">文本已复制至剪贴板</string>
 </resources>

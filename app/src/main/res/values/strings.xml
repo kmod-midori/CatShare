@@ -61,4 +61,6 @@
     <string name="err_recv_req_timeout">Timed out waiting for request</string>
     <string name="error_send_timeout_ws">Timeout waiting for WebSocket connection</string>
     <string name="error_send_timeout_handshake">Timeout waiting for handshake</string>
+    <string name="noti_request_desc_text">Wants to share text</string>
+    <string name="msg_copied_to_clipboard">Text copied to clipboard</string>
 </resources>

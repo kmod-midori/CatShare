@@ -16,8 +16,8 @@ android {
         applicationId = "moe.reimu.catshare"
         minSdk = 29
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.4"
     }
 
     signingConfigs {
@@ -93,7 +93,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("no.nordicsemi.android.kotlin.ble:client:1.1.0")
 
     implementation(libs.ktor.client.core)

@@ -63,20 +63,16 @@
         <activity
             android:name=".ShareActivity"
             android:exported="true"
-            android:label="@string/title_activity_share"
+            android:label="@string/send"
             android:theme="@style/Theme.CatShare">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="*/*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>

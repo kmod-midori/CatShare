@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -17,11 +19,14 @@ import android.net.wifi.p2p.WifiP2pGroup
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Environment
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.provider.MediaStore
 import android.text.format.Formatter
 import android.util.Log
 import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -43,6 +48,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -66,6 +72,7 @@ import moe.reimu.catshare.utils.connectSuspend
 import moe.reimu.catshare.utils.registerInternalBroadcastReceiver
 import moe.reimu.catshare.utils.removeGroupSuspend
 import moe.reimu.catshare.utils.requestGroupInfo
+import moe.reimu.catshare.utils.sendStatusIgnoreException
 import okhttp3.ConnectionPool
 import org.json.JSONObject
 import java.io.File
@@ -223,12 +230,17 @@ class P2pReceiverService : BaseP2pService() {
         fileName: String,
         fileCount: Int,
         totalSize: Long,
-        thumbnail: Bitmap?
+        thumbnail: Bitmap?,
+        textContent: String?
     ): Notification {
         val fmtSize = Formatter.formatShortFileSize(this, totalSize)
-        val contentText = resources.getQuantityString(
-            R.plurals.noti_request_desc, fileCount, fileCount, fmtSize
-        )
+        val contentText = if (textContent == null) {
+            resources.getQuantityString(
+                R.plurals.noti_request_desc, fileCount, fileCount, fmtSize
+            )
+        } else {
+            resources.getString(R.string.noti_request_desc_text)
+        }
 
         val dismissIntent = PendingIntent.getBroadcast(
             this,
@@ -252,6 +264,9 @@ class P2pReceiverService : BaseP2pService() {
 
         if (thumbnail != null) {
             n.setStyle(NotificationCompat.BigPictureStyle().bigPicture(thumbnail))
+        }
+        if (textContent != null) {
+            n.setStyle(NotificationCompat.BigTextStyle().bigText(textContent))
         }
 
         return n.build()
@@ -375,8 +390,10 @@ class P2pReceiverService : BaseP2pService() {
             }
         }
 
-        val p2pConfig =
-            WifiP2pConfig.Builder().setNetworkName(p2pInfo.ssid).setPassphrase(p2pInfo.psk).build()
+        val p2pConfig = WifiP2pConfig.Builder()
+            .setNetworkName(p2pInfo.ssid)
+            .setPassphrase(p2pInfo.psk)
+            .build()
 
         try {
             p2pFuture = CompletableDeferred()
@@ -411,6 +428,11 @@ class P2pReceiverService : BaseP2pService() {
                     val fileName = sendRequestPayload.getString("fileName")
                     val totalSize = sendRequestPayload.getLong("totalSize")
                     val fileCount = sendRequestPayload.getInt("fileCount")
+                    val textContent = if (sendRequestPayload.has("catShareText")) {
+                        sendRequestPayload.getString("catShareText")
+                    } else {
+                        null
+                    }
 
                     val thumbPath = sendRequestPayload.optString("thumbnail")
                     val bigPicture = if (thumbPath.isNotEmpty()) {
@@ -423,7 +445,13 @@ class P2pReceiverService : BaseP2pService() {
 
                     updateNotification(
                         createAskingNotification(
-                            localTaskId, senderName, fileName, fileCount, totalSize, bigPicture
+                            localTaskId,
+                            senderName,
+                            fileName,
+                            fileCount,
+                            totalSize,
+                            bigPicture,
+                            textContent
                         )
                     )
 
@@ -432,18 +460,24 @@ class P2pReceiverService : BaseP2pService() {
                     }
 
                     if (userResponse != true) {
-                        wsSession.send(
-                            Frame.Text(
-                                WebSocketMessage.makeStatus(
-                                    99,
-                                    taskId,
-                                    3,
-                                    "user refuse"
-                                ).toText()
-                            )
+                        wsSession.sendStatusIgnoreException(
+                            99,
+                            taskId,
+                            3,
+                            "user refuse"
                         )
-                        wsSession.flush()
                         throw CancelledByUserException()
+                    }
+
+                    if (textContent != null) {
+                        val cm = getSystemService(ClipboardManager::class.java)
+                        cm.setPrimaryClip(ClipData.newPlainText("Shared Text", textContent))
+
+                        showTextCopiedToast()
+
+                        wsSession.sendStatusIgnoreException(99, taskId, 1, "ok")
+                        delay(1000)
+                        return@async
                     }
 
                     updateNotification(
@@ -479,14 +513,8 @@ class P2pReceiverService : BaseP2pService() {
                                 senderName, files, files.size != fileCount
                             )
                         )
-
-                        try {
-                            val st = WebSocketMessage.makeStatus(99, taskId, 1, "")
-                            wsSession.send(Frame.Text(st.toText()))
-                            wsSession.flush()
-                        } catch (e: Throwable) {
-                            // ignore
-                        }
+                        wsSession.sendStatusIgnoreException(99, taskId, 1, "ok")
+                        delay(1000)
                     } else {
                         throw IllegalStateException("Failed to receive any file")
                     }
@@ -670,6 +698,16 @@ class P2pReceiverService : BaseP2pService() {
 
         if (internalReceiverRegistered) {
             unregisterReceiver(internalReceiver)
+        }
+    }
+
+    private fun showTextCopiedToast() {
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(
+                this@P2pReceiverService,
+                R.string.msg_copied_to_clipboard,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
