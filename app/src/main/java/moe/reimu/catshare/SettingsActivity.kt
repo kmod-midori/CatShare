@@ -147,9 +147,10 @@ fun SettingsActivityContent() {
                                 "${BuildConfig.APPLICATION_ID}.fileProvider",
                                 logFile
                             )
-                            val intent =
-                                Intent(Intent.ACTION_SEND).setDataAndType(uri, "text/plain")
-                                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            val intent = Intent(Intent.ACTION_SEND)
+                                .putExtra(Intent.EXTRA_STREAM, uri)
+                                .setType("text/plain")
+                                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             activity.startActivity(intent)
                         } catch (e: Exception) {
                             Log.e("LogcatCapture", "Failed to save logs", e)
