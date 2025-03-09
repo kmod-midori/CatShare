@@ -358,6 +358,12 @@ class P2pReceiverService : BaseP2pService() {
             .setContentText(
                 if (exception != null && exception is ExceptionWithMessage) {
                     exception.getMessage(this)
+                } else if (exception != null && exception is CancelledByUserException) {
+                    if (exception.isRemote) {
+                        getString(R.string.cancelled_by_user_remote)
+                    } else {
+                        getString(R.string.cancelled_by_user_local)
+                    }
                 } else {
                     getString(R.string.noti_send_interrupted)
                 }
@@ -466,7 +472,7 @@ class P2pReceiverService : BaseP2pService() {
                             3,
                             "user refuse"
                         )
-                        throw CancelledByUserException()
+                        throw CancelledByUserException(false)
                     }
 
                     if (textContent != null) {
@@ -575,7 +581,7 @@ class P2pReceiverService : BaseP2pService() {
                         }
                         statusFuture.onAwait { status ->
                             if (status.first == 3 && status.second == "user refuse") {
-                                throw CancelledByUserException()
+                                throw CancelledByUserException(true)
                             }
                             throw RuntimeException("Transfer terminated with $status")
                         }
@@ -686,7 +692,7 @@ class P2pReceiverService : BaseP2pService() {
     fun cancel(taskId: Int) {
         synchronized(currentTaskLock) {
             if (curreentTaskId == taskId) {
-                currentJob?.cancel(CancelledByUserException())
+                currentJob?.cancel(CancelledByUserException(false))
             }
         }
     }

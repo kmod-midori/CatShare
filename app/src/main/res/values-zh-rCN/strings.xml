@@ -60,4 +60,6 @@
     <string name="error_send_timeout_handshake">发送握手超时</string>
     <string name="noti_request_desc_text">请求发送文本</string>
     <string name="msg_copied_to_clipboard">文本已复制至剪贴板</string>
+    <string name="cancelled_by_user_local">传输已被本设备取消</string>
+    <string name="cancelled_by_user_remote">传输已被对端设备取消</string>
 </resources>

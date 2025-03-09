@@ -477,7 +477,7 @@ class P2pSenderService : BaseP2pService() {
 
                 if (status != null) {
                     if (status.first == 3 && status.second == "user refuse") {
-                        throw CancelledByUserException()
+                        throw CancelledByUserException(true)
                     }
                     if (status.first == 1) {
                         delay(1000)
@@ -562,7 +562,7 @@ class P2pSenderService : BaseP2pService() {
     fun cancel(taskId: Int) {
         synchronized(currentTaskLock) {
             if (curreentTaskId == taskId) {
-                currentJob?.cancel(CancelledByUserException())
+                currentJob?.cancel(CancelledByUserException(false))
             }
         }
     }
@@ -632,6 +632,12 @@ class P2pSenderService : BaseP2pService() {
             .setContentText(
                 if (exception != null && exception is ExceptionWithMessage) {
                     exception.getMessage(this)
+                } else if (exception != null && exception is CancelledByUserException) {
+                    if (exception.isRemote) {
+                        getString(R.string.cancelled_by_user_remote)
+                    } else {
+                        getString(R.string.cancelled_by_user_local)
+                    }
                 } else {
                     getString(R.string.noti_send_interrupted)
                 }
