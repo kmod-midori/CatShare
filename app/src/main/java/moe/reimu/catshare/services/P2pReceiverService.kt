@@ -13,7 +13,6 @@ import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pGroup
 import android.net.wifi.p2p.WifiP2pInfo
@@ -83,6 +82,7 @@ import java.util.zip.ZipInputStream
 import javax.net.ssl.SSLContext
 import kotlin.math.min
 import kotlin.random.Random
+import androidx.core.net.toUri
 
 class P2pReceiverService : BaseP2pService() {
     private lateinit var notificationManager: NotificationManagerCompat
@@ -333,7 +333,7 @@ class P2pReceiverService : BaseP2pService() {
             Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
                 putExtra(
                     "android.provider.extra.INITIAL_URI",
-                    Uri.parse("content://downloads/public_downloads")
+                    "content://downloads/public_downloads".toUri()
                 )
             }
         }

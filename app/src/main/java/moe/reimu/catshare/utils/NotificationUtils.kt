@@ -48,4 +48,8 @@ object NotificationUtils {
     fun showBluetoothToast(context: Context) {
         Toast.makeText(context, R.string.bluetooth_disabled, Toast.LENGTH_LONG).show()
     }
+
+    fun showWifiToast(context: Context) {
+        Toast.makeText(context, R.string.wifi_disabled, Toast.LENGTH_LONG).show()
+    }
 }
