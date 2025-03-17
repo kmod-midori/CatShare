@@ -8,6 +8,12 @@ Android 目前已不再支持非系统应用获取手机的 MAC 地址等无法�
 [<img src="https://f-droid.org/badge/get-it-on-zh-cn.png"
     alt="Get it on F-Droid"
     height="80">](https://f-droid.org/packages/moe.reimu.catshare)
+[<img src="https://www.openapk.net/images/openapk-badge.png"
+    alt="Get it on OpenAPK"
+    height="80">](https://www.openapk.net/catshare/moe.reimu.catshare/)
+[<img src="https://www.androidfreeware.net/images/androidfreeware-badge.png"
+    alt="Get it on Android Freeware"
+    height="80">](https://www.androidfreeware.net/download-catshare-apk.html)
 
 ## 功能
 - [x] 蓝牙发现
