@@ -17,6 +17,7 @@ import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pGroup
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
+import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
@@ -83,6 +84,7 @@ import javax.net.ssl.SSLContext
 import kotlin.math.min
 import kotlin.random.Random
 import androidx.core.net.toUri
+import moe.reimu.catshare.utils.ZipPathValidatorCallback
 
 class P2pReceiverService : BaseP2pService() {
     private lateinit var notificationManager: NotificationManagerCompat
@@ -140,7 +142,7 @@ class P2pReceiverService : BaseP2pService() {
 
     private val currentTaskLock = Object()
     private var currentJob: Job? = null
-    private var curreentTaskId: Int? = null
+    private var currentTaskId: Int? = null
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -190,7 +192,7 @@ class P2pReceiverService : BaseP2pService() {
         }
 
         synchronized(currentTaskLock) {
-            curreentTaskId = localTaskId
+            currentTaskId = localTaskId
             currentJob = job
         }
 
@@ -401,7 +403,7 @@ class P2pReceiverService : BaseP2pService() {
             .setPassphrase(p2pInfo.psk)
             .build()
 
-        try {
+        client.use { client ->
             p2pFuture = CompletableDeferred()
             val groupInfo = p2pManager.requestGroupInfo(p2pChannel)
             if (groupInfo != null) {
@@ -595,8 +597,6 @@ class P2pReceiverService : BaseP2pService() {
                 p2pManager.removeGroup(p2pChannel, null)
                 p2pManager.cancelConnect(p2pChannel, null)
             }
-        } finally {
-            client.close()
         }
     }
 
@@ -606,6 +606,9 @@ class P2pReceiverService : BaseP2pService() {
     ): List<ReceivedFile> {
         val receivedFiles = mutableListOf<ReceivedFile>()
         var processedSize = 0L
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+            dalvik.system.ZipPathValidator.setCallback(ZipPathValidatorCallback)
 
         while (true) {
             val entry = zipStream.nextEntry ?: break
@@ -691,7 +694,7 @@ class P2pReceiverService : BaseP2pService() {
 
     fun cancel(taskId: Int) {
         synchronized(currentTaskLock) {
-            if (curreentTaskId == taskId) {
+            if (currentTaskId == taskId) {
                 currentJob?.cancel(CancelledByUserException(false))
             }
         }
