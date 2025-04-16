@@ -210,7 +210,7 @@ class P2pReceiverService : BaseP2pService() {
             put(MediaStore.Downloads.DISPLAY_NAME, file.name)
             put(MediaStore.Downloads.MIME_TYPE, mimeType ?: "application/octet-stream")
             put(
-                MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS
+                MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/CatShare"
             )
         }
     }
@@ -607,8 +607,10 @@ class P2pReceiverService : BaseP2pService() {
         val receivedFiles = mutableListOf<ReceivedFile>()
         var processedSize = 0L
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // Disable validation as we only use the file name anyway
             dalvik.system.ZipPathValidator.setCallback(ZipPathValidatorCallback)
+        }
 
         while (true) {
             val entry = zipStream.nextEntry ?: break
