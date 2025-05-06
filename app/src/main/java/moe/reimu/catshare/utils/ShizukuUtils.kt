@@ -1,7 +1,9 @@
 package moe.reimu.catshare.utils
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.CompletableDeferred
@@ -9,6 +11,8 @@ import moe.reimu.catshare.BuildConfig
 import moe.reimu.catshare.IMacAddressService
 import moe.reimu.catshare.services.MacAddressService
 import rikka.shizuku.Shizuku
+import java.net.NetworkInterface
+import kotlin.collections.iterator
 
 object ShizukuUtils {
     private val binderLock = Object()
@@ -84,7 +88,13 @@ object ShizukuUtils {
         }
     }
 
-    fun getMacAddress(name: String, l: (String?) -> Unit) {
+    fun getMacAddress(context: Context, name: String, l: (String?) -> Unit) {
+        if (context.checkSelfPermission("android.permission.LOCAL_MAC_ADDRESS") == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "Permission granted, using native method")
+            l(nativeGetMacAddressByName(name))
+            return
+        }
+
         val th = Thread {
             val res = try {
                 unsafeGetMacAddress(name)
@@ -98,9 +108,22 @@ object ShizukuUtils {
         th.start()
     }
 
-    suspend fun getMacAddress(name: String): String? {
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun nativeGetMacAddressByName(name: String): String? {
+        val ifs = NetworkInterface.getNetworkInterfaces()
+        for (intf in ifs) {
+            if (intf.name == name) {
+                return intf.hardwareAddress?.toHexString(HexFormat {
+                    bytes.byteSeparator = ":"
+                })
+            }
+        }
+        return null
+    }
+
+    suspend fun getMacAddress(context: Context, name: String): String? {
         val fut = CompletableDeferred<String?>()
-        getMacAddress(name) {
+        getMacAddress(context, name) {
             fut.complete(it)
         }
         return fut.await()

@@ -49,7 +49,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class GattServerService : Service() {
-
     private lateinit var btManager: BluetoothManager
     private var btAdvertiser: BluetoothLeAdvertiser? = null
 
@@ -109,7 +108,7 @@ class GattServerService : Service() {
 
             val data = synchronized(localDeviceInfoLock) {
                 if (offset < localDeviceStatusBytes.size) {
-                    Arrays.copyOfRange(localDeviceStatusBytes, offset, localDeviceStatusBytes.size)
+                    localDeviceStatusBytes.copyOfRange(offset, localDeviceStatusBytes.size)
                 } else {
                     null
                 }
@@ -151,7 +150,7 @@ class GattServerService : Service() {
                 return
             } else {
                 writeRequests.remove(key)
-                Arrays.copyOfRange(writeReq.first, 0, newLength)
+                writeReq.first.copyOfRange(0, newLength)
             }
 
             if (responseNeeded) {
@@ -214,7 +213,7 @@ class GattServerService : Service() {
             return
         }
 
-        ShizukuUtils.getMacAddress("p2p0") {
+        ShizukuUtils.getMacAddress(this, "p2p0") {
             if (it != null) {
                 updateMacAddress(it)
             }

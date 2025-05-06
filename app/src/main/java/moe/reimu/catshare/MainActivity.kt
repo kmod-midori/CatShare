@@ -61,7 +61,6 @@ import rikka.shizuku.Shizuku
 import java.util.ArrayList
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -127,7 +126,7 @@ class MainActivity : ComponentActivity() {
                 continue
             }
 
-            Toast.makeText(this, "${name} not granted", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "$name not granted", Toast.LENGTH_LONG).show()
             finish()
 
             return
@@ -160,6 +159,10 @@ fun MainActivityContent() {
         onDispose {
             context.unregisterReceiver(receiver)
         }
+    }
+
+    val localMacAddressGranted = remember {
+        context.checkSelfPermission("android.permission.LOCAL_MAC_ADDRESS") == PackageManager.PERMISSION_GRANTED
     }
 
     var shizukuGranted by remember {
@@ -283,47 +286,50 @@ fun MainActivityContent() {
                     }
                 }
             }
-            item {
-                DefaultCard(onClick = {
-                    if (!shizukuGranted) {
-                        try {
-                            Shizuku.requestPermission(0)
-                        } catch (e: Throwable) {
-                            e.printStackTrace()
+
+            if (!localMacAddressGranted) {
+                item {
+                    DefaultCard(onClick = {
+                        if (!shizukuGranted) {
+                            try {
+                                Shizuku.requestPermission(0)
+                            } catch (e: Throwable) {
+                                e.printStackTrace()
+                            }
                         }
-                    }
-                }) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = if (shizukuAvailable && shizukuGranted) {
-                                ImageVector.vectorResource(R.drawable.ic_done)
-                            } else {
-                                ImageVector.vectorResource(R.drawable.ic_close)
-                            },
-                            contentDescription = null,
-                            modifier = iconMod,
-                        )
-                        Column {
-                            Text(
-                                text = stringResource(
-                                    if (shizukuAvailable) {
-                                        if (shizukuGranted) {
-                                            R.string.shizuku_available
+                    }) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (shizukuAvailable && shizukuGranted) {
+                                    ImageVector.vectorResource(R.drawable.ic_done)
+                                } else {
+                                    ImageVector.vectorResource(R.drawable.ic_close)
+                                },
+                                contentDescription = null,
+                                modifier = iconMod,
+                            )
+                            Column {
+                                Text(
+                                    text = stringResource(
+                                        if (shizukuAvailable) {
+                                            if (shizukuGranted) {
+                                                R.string.shizuku_available
+                                            } else {
+                                                R.string.shizuku_not_granted
+                                            }
                                         } else {
-                                            R.string.shizuku_not_granted
+                                            R.string.shizuku_unavailable
                                         }
-                                    } else {
-                                        R.string.shizuku_unavailable
-                                    }
-                                ),
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                            Text(
-                                text = stringResource(R.string.shizuku_desc),
-                            )
+                                    ),
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                                Text(
+                                    text = stringResource(R.string.shizuku_desc),
+                                )
+                            }
                         }
                     }
                 }

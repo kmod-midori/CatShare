@@ -391,7 +391,7 @@ class P2pSenderService : BaseP2pService() {
                     R.string.error_p2p_failed
                 )
 
-                val p2pMac = ShizukuUtils.getMacAddress("p2p0") ?: "02:00:00:00:00:00"
+                val p2pMac = ShizukuUtils.getMacAddress(this@P2pSenderService, "p2p0") ?: "02:00:00:00:00:00"
                 Log.d(TAG, "Advertised local MAC address: $p2pMac")
 
                 withTimeoutReason(
