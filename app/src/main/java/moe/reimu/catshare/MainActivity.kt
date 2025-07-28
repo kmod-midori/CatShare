@@ -98,6 +98,13 @@ class MainActivity : ComponentActivity() {
             permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
+        if (Build.VERSION.SDK_INT <= 32 && ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+
         if (Build.VERSION.SDK_INT >= 31) {
             for (perm in listOf(
                 Manifest.permission.BLUETOOTH_ADVERTISE,
