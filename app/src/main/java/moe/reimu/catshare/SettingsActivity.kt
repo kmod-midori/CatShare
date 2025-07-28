@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
@@ -58,8 +59,9 @@ class SettingsActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsActivityContent() {
-    val activity = LocalContext.current as Activity
-    val settings = remember(activity) { AppSettings(activity) }
+    val activity = LocalActivity.current
+    val context = LocalContext.current
+    val settings = remember(activity) { AppSettings(context) }
 
     var deviceNameValue by remember {
         mutableStateOf(settings.deviceName)
@@ -80,7 +82,7 @@ fun SettingsActivityContent() {
                     }
                     settings.verbose = verboseValue
 
-                    activity.finish()
+                    activity?.finish()
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Check, contentDescription = "Save"
@@ -143,7 +145,7 @@ fun SettingsActivityContent() {
                                 }
                             }
                             val uri = FileProvider.getUriForFile(
-                                activity,
+                                context,
                                 "${BuildConfig.APPLICATION_ID}.fileProvider",
                                 logFile
                             )
@@ -151,12 +153,12 @@ fun SettingsActivityContent() {
                                 .putExtra(Intent.EXTRA_STREAM, uri)
                                 .setType("text/plain")
                                 .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            activity.startActivity(intent)
+                            context.startActivity(intent)
                         } catch (e: Exception) {
                             Log.e("LogcatCapture", "Failed to save logs", e)
                             Toast.makeText(
-                                activity,
-                                activity.getString(R.string.log_capture_failed),
+                                context,
+                                context.getString(R.string.log_capture_failed),
                                 Toast.LENGTH_LONG
                             ).show()
                         }
