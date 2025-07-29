@@ -1,6 +1,7 @@
 package moe.reimu.catshare
 
-import android.app.Activity
+import android.os.Handler
+import android.os.Looper
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -152,15 +153,17 @@ fun SettingsActivityContent() {
                             val intent = Intent(Intent.ACTION_SEND)
                                 .putExtra(Intent.EXTRA_STREAM, uri)
                                 .setType("text/plain")
-                                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK) // ✅ 修复 startActivity
                             context.startActivity(intent)
                         } catch (e: Exception) {
                             Log.e("LogcatCapture", "Failed to save logs", e)
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.log_capture_failed),
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Handler(Looper.getMainLooper()).post {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.log_capture_failed),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
                     }.start()
                 }) {
