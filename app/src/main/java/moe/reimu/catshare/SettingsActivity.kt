@@ -153,7 +153,7 @@ fun SettingsActivityContent() {
                             val intent = Intent(Intent.ACTION_SEND)
                                 .putExtra(Intent.EXTRA_STREAM, uri)
                                 .setType("text/plain")
-                                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK) // ✅ 修复 startActivity
+                                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                             context.startActivity(intent)
                         } catch (e: Exception) {
                             Log.e("LogcatCapture", "Failed to save logs", e)
