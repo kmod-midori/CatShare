@@ -33,11 +33,30 @@ Android 目前已不再支持非系统应用获取手机的 MAC 地址等无法�
 你可以在该项目的 issue 区汇报你在使用 CatShare 期间遇到的问题，尽量的，请附上 CatShare 的 adb logcat 日志。
 
 通过该命令获取 CatShare 的日志。
+<details>
+<summary>release(正式版)</summary>
 
+shell(linux)
 ```shell
 adb logcat --pid $(adb shell pidof -s moe.reimu.catshare)
 ```
+cmd(windows)
+```shell
+for /f "tokens=1" %i in ('adb shell pidof -s moe.reimu.catshare') do adb logcat --pid %i
+```
+</details>
+<details>
+<summary>debug(测试版)</summary>
 
+shell(linux)
+```shell
+adb logcat --pid $(adb shell pidof -s moe.reimu.catshare.debug)
+```
+cmd(windows)
+```shell
+for /f "tokens=1" %i in ('adb shell pidof -s moe.reimu.catshare.debug') do adb logcat --pid %i
+```
+</details>
 建议尽可能完整的截取日志，并注释从什么时候发送或接收内容，尽量使用折叠块语法来包裹日志内容。
 
 ````markdown
