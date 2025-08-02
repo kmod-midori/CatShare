@@ -145,7 +145,7 @@ class ShareActivity : ComponentActivity() {
                     } else {
                         it.getString(mimeIndex)
                     },
-                    it.getInt(it.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)),
+                    it.getLong(it.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)),
                     null
                 )
             } else {
