@@ -72,6 +72,10 @@ fun SettingsActivityContent() {
         mutableStateOf(settings.verbose)
     }
 
+    var autoAcceptValue by remember {
+        mutableStateOf(settings.autoAccept)
+    }
+
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(text = stringResource(R.string.title_activity_settings)) },
@@ -124,6 +128,23 @@ fun SettingsActivityContent() {
                         Spacer(modifier = Modifier.weight(1.0f))
                         Switch(checked = verboseValue, onCheckedChange = {
                             verboseValue = it
+                        })
+                    }
+                }
+            }
+            item {
+                DefaultCard {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.auto_accept_name),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Spacer(modifier = Modifier.weight(1.0f))
+                        Switch(checked = autoAcceptValue, onCheckedChange = {
+                            autoAcceptValue = it
                         })
                     }
                 }

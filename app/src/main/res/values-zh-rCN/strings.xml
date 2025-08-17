@@ -63,4 +63,5 @@
     <string name="cancelled_by_user_local">传输已被本设备取消</string>
     <string name="cancelled_by_user_remote">传输已被对端设备取消</string>
     <string name="wifi_disabled">WiFi 已关闭或不可用</string>
+    <string name="auto_accept_name">自动接收</string>
 </resources>

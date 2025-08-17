@@ -451,30 +451,33 @@ class P2pReceiverService : BaseP2pService() {
                         BitmapFactory.decodeByteArray(body, 0, body.size)
                     } else null
 
-                    updateNotification(
-                        createAskingNotification(
-                            localTaskId,
-                            senderName,
-                            fileName,
-                            fileCount,
-                            totalSize,
-                            bigPicture,
-                            textContent
+                    if (!AppSettings(this@P2pReceiverService).autoAccept) {
+                        // Ask user for confirmation
+                        updateNotification(
+                            createAskingNotification(
+                                localTaskId,
+                                senderName,
+                                fileName,
+                                fileCount,
+                                totalSize,
+                                bigPicture,
+                                textContent
+                            )
                         )
-                    )
 
-                    val userResponse = withTimeoutOrNull(10000L) {
-                        waitForAction(localTaskId)
-                    }
+                        val userResponse = withTimeoutOrNull(10000L) {
+                            waitForAction(localTaskId)
+                        }
 
-                    if (userResponse != true) {
-                        wsSession.sendStatusIgnoreException(
-                            99,
-                            taskId,
-                            3,
-                            "user refuse"
-                        )
-                        throw CancelledByUserException(false)
+                        if (userResponse != true) {
+                            wsSession.sendStatusIgnoreException(
+                                99,
+                                taskId,
+                                3,
+                                "user refuse"
+                            )
+                            throw CancelledByUserException(false)
+                        }
                     }
 
                     if (textContent != null) {

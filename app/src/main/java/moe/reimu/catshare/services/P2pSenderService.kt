@@ -516,7 +516,7 @@ class P2pSenderService : BaseP2pService() {
             return START_NOT_STICKY
         }
 
-        val task = intent.getParcelableExtra<TaskInfo>("task") ?: return START_NOT_STICKY
+        @Suppress("DEPRECATION") val task = intent.getParcelableExtra<TaskInfo>("task") ?: return START_NOT_STICKY
         val job = CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
             try {
                 startForeground(

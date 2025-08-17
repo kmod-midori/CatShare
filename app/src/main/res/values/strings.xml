@@ -66,4 +66,5 @@
     <string name="cancelled_by_user_local">Transmission has been cancalled by this device</string>
     <string name="cancelled_by_user_remote">Transmission has been cancelled by remote device</string>
     <string name="wifi_disabled">WiFi is disabled or unavailable</string>
+    <string name="auto_accept_name">Automatic Accept</string>
 </resources>
