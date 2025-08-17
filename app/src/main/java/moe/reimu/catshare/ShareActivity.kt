@@ -88,7 +88,7 @@ class ShareActivity : ComponentActivity() {
 
         val fileInfos = try {
             if (intent.action == Intent.ACTION_SEND) {
-                val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                @Suppress("DEPRECATION") val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
                 if (uri != null) {
                     listOf(uri).mapNotNull { extractFileInfo(it) }
                 } else {
@@ -100,10 +100,11 @@ class ShareActivity : ComponentActivity() {
                     )
                 }
             } else {
-                val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                @Suppress("DEPRECATION") val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
                 uris?.mapNotNull { extractFileInfo(it) } ?: emptyList()
             }
         } catch (e: Throwable) {
+            Log.e("ShareActivity", "Failed to extract file info", e)
             Toast.makeText(this, R.string.no_file_shared, Toast.LENGTH_SHORT).show()
             finish()
             return
@@ -160,39 +161,6 @@ class ShareActivity : ComponentActivity() {
 fun ShareActivityContent(files: List<FileInfo>) {
     val context = LocalContext.current
     val discoveredDevices = deviceScanner()
-
-    var senderService by remember { mutableStateOf<P2pSenderService?>(null) }
-
-    LifecycleStartEffect(context) {
-        var isBound = false
-
-        val connection = object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName, service: IBinder) {
-                val binder = service as P2pSenderService.LocalBinder
-                isBound = true
-                senderService = binder.getService()
-            }
-
-            override fun onServiceDisconnected(name: ComponentName) {
-                isBound = false
-                senderService = null
-            }
-        }
-
-        context.bindService(
-            Intent(context, P2pSenderService::class.java),
-            connection,
-            Context.BIND_AUTO_CREATE
-        )
-
-        onStopOrDispose {
-            if (isBound) {
-                context.unbindService(connection)
-                isBound = false
-                senderService = null
-            }
-        }
-    }
 
     val listState = rememberLazyListState()
     val iconMod = Modifier

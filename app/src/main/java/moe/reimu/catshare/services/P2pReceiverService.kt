@@ -678,8 +678,8 @@ class P2pReceiverService : BaseP2pService() {
                 }
 
                 when (intent.action) {
-                    ACTION_ACCEPTED -> it.resume(true) {}
-                    ACTION_DISMISSED -> it.resume(false) {}
+                    ACTION_ACCEPTED -> it.resume(true) { cause, _, _ -> }
+                    ACTION_DISMISSED -> it.resume(false) { cause, _, _ -> }
                 }
             }
         }
