@@ -207,10 +207,6 @@ fun MainActivityContent() {
         }
     }
 
-    val iconMod = Modifier
-        .size(48.dp)
-        .padding(end = 16.dp)
-
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = stringResource(R.string.app_name)) }, actions = {
             IconButton(onClick = {
@@ -237,11 +233,7 @@ fun MainActivityContent() {
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Share,
-                            contentDescription = null,
-                            modifier = iconMod,
-                        )
+                        MyIcon(Icons.Filled.Share)
                         Column {
                             Text(
                                 text = stringResource(R.string.send),
@@ -261,12 +253,8 @@ fun MainActivityContent() {
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_bluetooth_searching),
-                            contentDescription = null,
-                            modifier = iconMod,
-                        )
-                        Column {
+                        MyIcon(ImageVector.vectorResource(R.drawable.ic_bluetooth_searching))
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = stringResource(R.string.discoverable),
                                 style = MaterialTheme.typography.titleMedium,
@@ -275,14 +263,13 @@ fun MainActivityContent() {
                                 text = stringResource(R.string.discoverable_desc),
                             )
                         }
-                        Spacer(modifier = Modifier.weight(1.0f))
                         Switch(checked = checked, onCheckedChange = {
                             if (it) {
                                 GattServerService.start(context)
                             } else {
                                 GattServerService.stop(context)
                             }
-                        })
+                        }, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
             }
@@ -302,14 +289,12 @@ fun MainActivityContent() {
                             modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = if (shizukuAvailable && shizukuGranted) {
+                            MyIcon(
+                                if (shizukuAvailable && shizukuGranted) {
                                     ImageVector.vectorResource(R.drawable.ic_done)
                                 } else {
                                     ImageVector.vectorResource(R.drawable.ic_close)
-                                },
-                                contentDescription = null,
-                                modifier = iconMod,
+                                }
                             )
                             Column {
                                 Text(
@@ -376,5 +361,15 @@ class ChooseFilesContract : ActivityResultContract<Void?, List<Uri>>() {
 
         return ret
     }
+}
 
+@Composable
+fun MyIcon(imageVector: ImageVector) {
+    Icon(
+        imageVector = imageVector,
+        contentDescription = null,
+        modifier = Modifier
+            .size(48.dp)
+            .padding(end = 16.dp),
+    )
 }
