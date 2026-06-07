@@ -78,6 +78,10 @@ android {
             excludes += "META-INF/INDEX.LIST"
             excludes += "META-INF/*.properties"
         }
+        jniLibs {
+            // 禁用 debug 版本的 JNI 符号剥离（规避 NDK llvm-strip 在非 x86_64 环境下的启动失败问题
+            keepDebugSymbols += "**/*.so"
+        }
     }
 }
 
@@ -97,9 +101,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation(libs.kotlinx.coroutines.android)
     implementation("no.nordicsemi.android.kotlin.ble:client:1.3.1")
+    implementation(libs.accompanist.permissions)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)

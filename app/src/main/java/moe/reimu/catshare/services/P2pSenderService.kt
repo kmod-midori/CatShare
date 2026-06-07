@@ -46,7 +46,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import moe.reimu.catshare.AppSettings
 import moe.reimu.catshare.BleSecurity
@@ -95,7 +94,7 @@ class P2pSenderService : BaseP2pService() {
 
     private val currentTaskLock = Object()
     private var currentJob: Job? = null
-    private var curreentTaskId: Int? = null
+    private var currentTaskId: Int? = null
 
     private lateinit var notificationManager: NotificationManagerCompat
 
@@ -545,14 +544,14 @@ class P2pSenderService : BaseP2pService() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 MyApplication.getInstance().clearBusy()
                 synchronized(currentTaskLock) {
-                    curreentTaskId = null
+                    currentTaskId = null
                     currentJob = null
                 }
             }
         }
 
         synchronized(currentTaskLock) {
-            curreentTaskId = task.id
+            currentTaskId = task.id
             currentJob = job
         }
 
@@ -561,7 +560,7 @@ class P2pSenderService : BaseP2pService() {
 
     fun cancel(taskId: Int) {
         synchronized(currentTaskLock) {
-            if (curreentTaskId == taskId) {
+            if (currentTaskId == taskId) {
                 currentJob?.cancel(CancelledByUserException(false))
             }
         }
