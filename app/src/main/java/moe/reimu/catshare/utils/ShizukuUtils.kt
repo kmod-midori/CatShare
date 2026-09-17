@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.CompletableDeferred
+import moe.reimu.catshare.AppSettings
 import moe.reimu.catshare.BuildConfig
 import moe.reimu.catshare.IMacAddressService
 import moe.reimu.catshare.services.MacAddressService
@@ -89,6 +90,15 @@ object ShizukuUtils {
     }
 
     fun getMacAddress(context: Context, name: String, l: (String?) -> Unit) {
+        if (name == "p2p0") {
+            val manualMac = AppSettings(context).manualMacAddress
+            if (manualMac.isNotEmpty()) {
+                Log.d(TAG, "Using manually configured MAC address for $name: $manualMac")
+                l(manualMac)
+                return
+            }
+        }
+
         if (context.checkSelfPermission("android.permission.LOCAL_MAC_ADDRESS") == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Permission granted, using native method")
             l(nativeGetMacAddressByName(name))

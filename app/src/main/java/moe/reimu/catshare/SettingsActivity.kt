@@ -68,6 +68,12 @@ fun SettingsActivityContent() {
         mutableStateOf(settings.deviceName)
     }
 
+    var manualMacValue by remember {
+        mutableStateOf(settings.manualMacAddress)
+    }
+
+    val manualMacError = manualMacValue.isNotBlank() && AppSettings.normalizeMacAddress(manualMacValue) == null
+
     var verboseValue by remember {
         mutableStateOf(settings.verbose)
     }
@@ -85,7 +91,20 @@ fun SettingsActivityContent() {
                     if (nameValue.isNotBlank()) {
                         settings.deviceName = nameValue
                     }
+
+                    val normalizedManualMac = AppSettings.normalizeMacAddress(manualMacValue)
+                    if (manualMacValue.isNotBlank() && normalizedManualMac == null) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.manual_mac_address_invalid),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@IconButton
+                    }
+
+                    settings.manualMacAddress = normalizedManualMac ?: ""
                     settings.verbose = verboseValue
+                    settings.autoAccept = autoAcceptValue
 
                     activity?.finish()
                 }) {
@@ -110,6 +129,27 @@ fun SettingsActivityContent() {
                             value = deviceNameValue,
                             onValueChange = { deviceNameValue = it },
                             label = { Text(stringResource(R.string.device_name)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+            item {
+                DefaultCard {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        OutlinedTextField(
+                            value = manualMacValue,
+                            onValueChange = { manualMacValue = it },
+                            label = { Text(stringResource(R.string.manual_mac_address)) },
+                            singleLine = true,
+                            isError = manualMacError,
+                            supportingText = {
+                                if (manualMacError) {
+                                    Text(stringResource(R.string.manual_mac_address_invalid))
+                                } else {
+                                    Text(stringResource(R.string.manual_mac_address_desc))
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

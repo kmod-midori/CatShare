@@ -34,7 +34,7 @@
     <string name="receiver_stopped">Receiver stopped</string>
     <string name="shizuku_available">Shizuku is available</string>
     <string name="shizuku_unavailable">Shizuku unavailable</string>
-    <string name="shizuku_desc">Shizuku is used to obtain your device\'s MAC address</string>
+    <string name="shizuku_desc">Shizuku can be used to obtain your device\'s MAC address</string>
     <string name="shizuku_not_granted">Shizuku permission not granted</string>
     <string name="title_activity_share">Send Files</string>
     <string name="sending">Sending</string>
@@ -50,6 +50,9 @@
     <string name="title_activity_settings">Settings</string>
     <string name="device_name">Device Name</string>
     <string name="device_name_default_value">My Phone</string>
+    <string name="manual_mac_address">Manual MAC Address</string>
+    <string name="manual_mac_address_desc">Optional. Supported formats: 00:11:22:33:44:55, 001122334455, 00-11-22-33-44-55. Case-insensitive.</string>
+    <string name="manual_mac_address_invalid">Invalid MAC address, please enter 6 bytes in hexadecimal form.</string>
     <string name="log_capture_failed">Failed to capture logs</string>
     <string name="capture_logs">Capture Logs</string>
     <string name="capture_logs_desc">Capture debug logs for troubleshooting</string>

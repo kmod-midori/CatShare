@@ -16,6 +16,13 @@ class AppSettings(private val context: Context) {
             prefs.edit { putString("deviceName", value) }
         }
 
+    var manualMacAddress: String
+        get() = prefs.getString("manualMacAddress", "")?.takeIf { it.isNotBlank() } ?: ""
+        set(value) {
+            val normalized = normalizeMacAddress(value)
+            prefs.edit { putString("manualMacAddress", normalized ?: "") }
+        }
+
     var verbose: Boolean
         get() = prefs.getBoolean("verbose", false)
         set(value) {
@@ -27,4 +34,23 @@ class AppSettings(private val context: Context) {
         set(value) {
             prefs.edit { putBoolean("autoAccept", value) }
         }
+
+    companion object {
+        fun normalizeMacAddress(value: String?): String? {
+            if (value == null) {
+                return null
+            }
+
+            val cleaned = value.trim().replace(Regex("[\\s:.-]"), "")
+            if (cleaned.length != 12) {
+                return null
+            }
+
+            if (!cleaned.all { it in '0'..'9' || it.lowercaseChar() in 'a'..'f' }) {
+                return null
+            }
+
+            return cleaned.chunked(2).joinToString(":") { it.lowercase() }
+        }
+    }
 }

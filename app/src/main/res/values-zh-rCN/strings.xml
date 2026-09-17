@@ -31,7 +31,7 @@
     <string name="receiver_stopped">接收服务已停止</string>
     <string name="shizuku_available">Shizuku 可用</string>
     <string name="shizuku_unavailable">Shizuku 不可用</string>
-    <string name="shizuku_desc">本应用使用 Shizuku 获取您设备的 MAC 地址</string>
+    <string name="shizuku_desc">本应用可使用 Shizuku 获取您设备的 MAC 地址</string>
     <string name="shizuku_not_granted">Shizuku 未授权</string>
     <string name="title_activity_share">发送文件</string>
     <string name="sending">正在发送</string>
@@ -47,6 +47,9 @@
     <string name="title_activity_settings">设置</string>
     <string name="device_name">设备名称</string>
     <string name="device_name_default_value">我的手机</string>
+    <string name="manual_mac_address">手动 MAC 地址</string>
+    <string name="manual_mac_address_desc">可选，支持 00:11:22:33:44:55、001122334455、00-11-22-33-44-55 等格式，大小写会自动处理。</string>
+    <string name="manual_mac_address_invalid">MAC 地址格式无效，请输入 6 字节十六进制地址。</string>
     <string name="log_capture_failed">日志获取失败</string>
     <string name="capture_logs">捕获日志</string>
     <string name="capture_logs_desc">捕获调试日志以排查问题</string>
