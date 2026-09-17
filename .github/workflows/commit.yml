@@ -20,6 +20,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools"
 
       - name: Build Application
         run: ./gradlew --no-daemon app:assembleDebug :app:lintReportDebug
